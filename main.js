@@ -1,5 +1,7 @@
 
 const mongoose = require('mongoose');
+var ObjectId = require('mongodb').ObjectID;
+
 mongoose.connect(
     'mongodb://127.0.0.1:27017/Novus', {
         useNewUrlParser: true,
@@ -9,7 +11,6 @@ mongoose.connect(
     }
 )
 
-var ObjectId = require('mongodb').ObjectID;
 const chatSchema = new mongoose.Schema();
 const chatevent = mongoose.model('chatevents', chatSchema);
 const userevents = mongoose.model('userevents', chatSchema);
