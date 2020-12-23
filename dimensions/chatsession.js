@@ -472,10 +472,12 @@ function getAvgStats(startDate, endDate, Model){
 
 
  /* // Sitzungen (Anzahl Sitzungen die berechnet werden konnten, also Daten zu Beitritt und Austritt vorhanden) ...
-        // ... und deren Länge (Zeit zwischen erstem Gastbeitritt und letzten Gastaustritt), sowie kürzeste und längste Sitzung
-        startDate = '2020-09-20'
-        endDate = '2020-10-28'
+        // ... und deren Länge (Zeit zwischen erstem Gastbeitritt und letzten Gastaustritt), sowie kürzeste, längste und avg. Sitzung
+        startDate = time.getSpecificDate('2020-10-21')[0]
+        endDate = time.getSpecificDate('2020-10-21')[1]
         chatsessions.getDurations(startDate, endDate, chatevent_coll).then(function(array){
+            res.write('chatsessions.getDurations: // Sitzungen (Anzahl Sitzungen die berechnet werden konnten,<br> also Daten zu Beitritt und Austritt vorhanden)' +
+            '<br> und deren Länge (Zeit zwischen erstem Gastbeitritt und letzten Gastaustritt),<br> sowie kürzeste, längste und durchschn. Sitzung <br>')
              for(elem of array[0]){
                 res.write('<br>ID: ' + elem._id)
                 res.write('<br>Erster Gastzutritt: ' + elem.min)
@@ -486,12 +488,15 @@ function getAvgStats(startDate, endDate, Model){
             res.write('<br>Kürzeste Sitzung: ' + array[1][1])
             res.write('<br>Längste Sitzung: ' + array[1][2])
             res.write('<br>Durchschnittliche Länge: ' + array[1][3])
-        })  */
+        })   */
 
         /* // ChatSession Gründe (Fallabschluß, Kredit etc..) und Ihre Häufigkeit
-        startDate = '2020-09-20'
-        endDate = '2020-10-28'
+        startDate = time.getTimeSpan('2020-10-15', '2020-10-18')[0]
+        endDate = time.getTimeSpan('2020-10-15', '2020-10-18')[1]
+        res.write('<br>Startdatum: ' + startDate + '<br>Enddatum: ' + endDate)
+
          chatsessions.ratingsAggregate(startDate, endDate, agentSettings_coll, agentRatings_coll).then(function(array){
+            res.write('<br><br>chatsession.ratingsAggregate: // ChatSession Gründe (Fallabschluß, Kredit etc..) und Ihre Häufigkeit')
             for(elem of array[0]){
                 res.write('Thema: ' + elem.title + '<br>Count: ' + elem.count + '<br>')
             }
@@ -507,12 +512,14 @@ function getAvgStats(startDate, endDate, Model){
             for(elem of array[3]){
                 res.write('<br>' + elem)
             }
-        })   */
+        }) */  
         
         /* //Chatsessions mit den in der Session benutzten Funktionen in chronologisch richtiger Reihenfolge, separierbar nach einem Datum.
-        startDate = '2020-08-01'
+        startDate = '2020-08-28'
         endDate = '2020-08-31'
+        res.write('<br>Startdatum: ' + startDate + '<br>Enddatum: ' + endDate)
         chatsessions.getUsedFunctionsInOrder(startDate, endDate, chatevent_coll).then(function(array){
+            res.write('<br><br>chatsession.getUsedFunctionInOrder: //Chatsessions mit den in der Session benutzten <br>Funktionen in chronologisch richtiger Reihenfolge, separierbar nach einem Datum.')
             for(elem of array){
                 res.write('<br><br>ChatSession: ' + elem._id)
                 for(funct of elem.functions){
@@ -521,17 +528,19 @@ function getAvgStats(startDate, endDate, Model){
             }
         });  */
 
-        /* //Chatsession Anzahl mit Zeitspanne
+        /* startDate = time.getLastQuarter()[0]
+        endDate = time.getLastQuarter()[1]
+        //Chatsession Anzahl mit Zeitspanne
         chatsessions.getTotalByDate(startDate, endDate, chatsessions_coll).then(function(total){
-            res.write('<br>Chatsessions zwischen dem ' + startDate + ' und dem ' + endDate + ': ' + total)
+            res.write('<br><br>chatsession.getTotal: //Chatsession Anzahl mit Zeitspanne<br>')
+            res.write('<br>Chatsessions zwischen <br>' + startDate + '<br> und <br>' + endDate + ':<br> ' + total)
         }) */
 
-        /* //ChatSession Stats (Gesamt ChatSessions, Durchschn. Guests/Agents pro Session)
-        startDate = '2020-08-01'
-        endDate = '2020-08-31'
+         /* //ChatSession Stats (Gesamt ChatSessions, Durchschn. Guests/Agents pro Session)
         chatsessions.getAvgStats(startDate, endDate, chatsessions_coll).then(function(avgs){
+            res.write('<br><br>chatsession.getAvgStats: //ChatSession Stats (Gesamt ChatSessions, Durchschn. Guests/Agents pro Session)<br>')
             res.write('Zeitraum: ' + startDate + ' - ' + endDate + '<br>')
             res.write('Gesamtzahl ChatSessions: ' + avgs[0] + '<br>Durchschnittlich angemeldete Guests: ' + avgs[1] + '<br>Durchschnittlich angemeldete Agents: ' + avgs[2])
-        }) */
+        })  */
 
-module.exports = {ratingsAggregate, getDurations, getUsedFunctionsInOrder, getAvgStats};
+module.exports = {ratingsAggregate, getDurations, getUsedFunctionsInOrder, getAvgStats, getTotalByDate, getTotalGAByDate};

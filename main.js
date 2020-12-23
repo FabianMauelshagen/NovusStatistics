@@ -35,14 +35,6 @@ mongoose.connect(
 main.get('/', (req, res) => {
     res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8;'})
     
-    startDate = time.getLastMonth()[0]
-    endDate = time.getLastMonth()[1]
-    functions.getTime(startDate, endDate, 7, 10, chatevent_coll).then(function(result){
-        for(elem of result){
-            res.write('<br>Type: ' + elem.type + ' Uhrzeit: ' + elem.hours + ' Date: ' + elem.datetime)
-        }
-    })
-
 })
 
 main.listen(port, () => {

@@ -1,10 +1,6 @@
 // Get time Tageszeit
-function getTime(startDate, endDate, from, to, Model) {
+function getTimes(startDate, endDate, from, to, Model) {
     return new Promise(function(resolve, reject){
-        /* let startDate = new Date(date)
-        let endDate = new Date(date)
-        startDate.setHours(0,0,0,0)
-        endDate.setHours(23,59,59,0) */
         Model.aggregate([
           {
               '$match': {
@@ -69,7 +65,7 @@ function getTime(startDate, endDate, from, to, Model) {
                   '$and': [
                       {
                           'hours': {
-                              '$gt': from
+                              '$gte': from
                           }
                       }, {
                           'hours': {
@@ -78,6 +74,10 @@ function getTime(startDate, endDate, from, to, Model) {
                       }
                   ]
               }
+          },{
+            '$sort': {
+              'datetime': 1
+            }
           }
       ], function(err, result){
           resolve(result)
@@ -151,7 +151,7 @@ function getTime(startDate, endDate, from, to, Model) {
                     '$and': [
                       {
                         'hours': {
-                          '$gt': from
+                          '$gte': from
                         }
                       }, {
                         'hours': {
@@ -178,4 +178,32 @@ function getTime(startDate, endDate, from, to, Model) {
         })
   }
 
-  module.exports = {getTime, getBusyTimes};
+// Test Aufrufe innerhalb der main.js Datei
+
+
+  /*   //Datums und Zeitsetzung
+  startDate = time.getLastMonth()[0]
+  endDate = time.getLastMonth()[1]
+  let from = 7
+  let to = 16 */
+
+   /* res.write('<br>Startdatum: ' + startDate + '<br>Enddatum: ' + endDate)
+   // Funktions Nutzungen mit Zeitstempel 
+  functions.getTimes(startDate, endDate, from, to, chatevent_coll).then(function(result){
+      res.write('<br><br>functions.getTimes: // Funktions Nutzungen mit Zeitstempel (Aktuell von 8 bis 10 Uhr)<br>')
+      for(elem of result){
+          res.write('<br>Type: ' + elem.type + ' Uhrzeit: ' + elem.datetime)
+      }
+  })   */
+
+  /*  // Funktions Nutzungen pro Stunde 
+  res.write('<br>Startdatum: ' + startDate + '<br>Enddatum: ' + endDate)
+  functions.getBusyTimes(startDate, endDate, from, to, chatevent_coll).then(function(result){
+      res.write('<br><br>functions.getBusyTimes: // Funktions Nutzungen pro Stunde von 7 bis 16<br>')
+      for(elem of result){
+          res.write('<br>Uhrzeit: ' + elem._id + '-' + (elem._id + 1) + ' | Funktionen genutzt: ' + elem.count)
+      }
+  })   */
+
+
+  module.exports = {getTimes, getBusyTimes};

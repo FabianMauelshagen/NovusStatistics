@@ -164,25 +164,30 @@ function getInviteStats(startDate, endDate, Model){
 
 
  /* // Datums Setzung
-    startDate = time.getLastQuarter()[0]
-    endDate = time.getLastQuarter()[1]
-    console.log('start: ' + startDate + ' end: ' + endDate)  */
+    startDate = time.getLastMonth()[0]
+    endDate = time.getLastMonth()[1]
+    res.write('start: ' + startDate + ' end: ' + endDate)  */
 
-    /* // User System Statistik (Anzahl Browser Nutzung etc.)
-    guests.getUseCounts(startDate, endDate, sysdiagnostics_coll, 0).then(function(array){
-        for(elem of array){
-            res.write('<br>Wert: ' + elem._id + '<br>Count: ' + elem.count)
-        }
-    }) */
+    /* res.write('<br><br>guests.getUseCounts: // User System Statistik (Browser, OS, hasCamera, hasMicrophone, hasSpeakers)')
+    for(var i = 0; i < 5; i++){
+        // User System Statistik (Anzahl Browser Nutzung etc.)
+        guests.getUseCounts(startDate, endDate, sysdiagnostics_coll, i).then(function(array){
+            res.write('<br>')
+            for(elem of array){
+                res.write('<br>Wert: ' + elem._id + '<br>Count: ' + elem.count)
+            }
+        })
+    } */
 
     /* // Gesamtzahl Kunden (Aufruf Redundant da in getStats erhalten)
     guests.getTotal(startDate, endDate, guests_coll).then(function(result){
+        res.write('<br><br>guests.getTotal: // Gesamtzahl Kunden (Aufruf Redundant da in getStats erhalten) <br>')
             res.write('Anzahl Kunden: ' + result)
     })  */
 
-     /* // Anzahl Gäste Gesamt, Gesamt / Tag, Durchschnitt / Tag, Min und Max Werte 
+    /*  // Anzahl Gäste Gesamt, Gesamt / Tag, Durchschnitt / Tag, Min und Max Werte 
     guests.getStats(startDate, endDate, guests_coll).then(function(array){
-        let total = 0
+        res.write('<br><br>guests.getStats: // Anzahl Gäste Gesamt, Gesamt / Tag, Durchschnitt / Tag, Min und Max Werte  <br>')
         for(elem of array[0]){
             res.write('<br>Count: ' + elem)
         }
@@ -192,6 +197,7 @@ function getInviteStats(startDate, endDate, Model){
         
     /* // Annahme Häufigkeit bei Screensharing Einladung
     guests.getInviteStats(startDate, endDate, chatevent_coll).then(function(array){
+        res.write('<br><br>guests.getInviteStats: // Annahme Häufigkeit bei Screensharing Einladung  <br>')
         for(elem of array){
             res.write('<br>Type: ' + elem._id + ' | Count: ' + elem.count)
         }

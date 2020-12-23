@@ -137,7 +137,7 @@ function getLastQuarter(){
 }
 
 // Aktuelles Quartal bis Tag Heute
-function getLastQuarter(){
+function getCurrentQuarter(){
     let startDate = new Date()
     let endDate = new Date()
     let month = endDate.getMonth()
@@ -153,22 +153,42 @@ function getLastQuarter(){
 
 // Aufruf bzw Verwendung in main.js:
 
-// let seDate = time.getCurrentYear()
-// startDate = seDate[0]
-// endDate = seDate[1]
-// console.log('StartDate: ' + startDate + ', EndDate: ' + endDate)
-// ... Aufruf der Dimensions Funktionen mit übergabe der startDate und endDate Parameter (Evtl Umstellung der Parameter zu einem Array, also übergabe
-// von seDate statt startDate/endDate)
+/* let date = []  
+    res.write('<br>Heute: 23.12.2020<br>' )
+    date = time.getSpecificDate('2020-12-24')
+    res.write('<br>time.getSpecificDate: (Heilig Abend)')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getTimeSpan('2020-12-24', '2020-12-26')
+    res.write('<br>time.getTimeSpan: (Weihnachts Tage)')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getYesterday()
+    res.write('<br>time.getYesterday:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getLastSevenDays()
+    res.write('<br>time.getLastSevenDays:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getLastWeek()
+    res.write('<br>time.getLastWeek: (Mo-Sa)')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getCurrentMonth()
+    res.write('<br>time.getCurrentMonth:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getLastMonth()
+    res.write('<br>time.getLastMonth:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getCurrentQuarter()
+    res.write('<br>time.getCurrentQuarter:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getLastQuarter()
+    res.write('<br>time.getLastQuarter:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getCurrentYear()
+    res.write('<br>time.getCurrentYear:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1])
+    date = time.getLastYear()
+    res.write('<br>time.getLastYear:')
+    res.write('<br>Startdatum: ' + date[0] + '<br>Enddatum: ' + date[1]) */
 
 
-// Berechnung des aktuellen Quartals
-/* let startDate = new Date()
-    let endDate = new Date()
-    let month = (endDate.getMonth() + 1)
-    let quarter = 0
-    let mod = (month % 3)
-    quarter = Math.floor((month - mod) / 3)
-    if(!mod == 0) quarter++ */
 
-
-module.exports = {getYesterday, getLastWeek, getLastSevenDays, getSpecificDate, getTimeSpan, getLastMonth, getCurrentMonth, getCurrentYear, getLastYear, getLastQuarter};
+module.exports = {getYesterday, getLastWeek, getLastSevenDays, getSpecificDate, getTimeSpan, getLastMonth, getCurrentMonth, getCurrentYear, getLastYear, getLastQuarter, getCurrentQuarter};
