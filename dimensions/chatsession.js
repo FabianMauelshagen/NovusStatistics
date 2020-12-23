@@ -21,7 +21,7 @@ function chatSessionAggregate(startDate, endDate, Model){
                       }
                     ]
                   }
-                },{
+                }, {
                     $match: {
                     $or: [
                         {
@@ -170,11 +170,11 @@ function ratingsAggregate(startDate, endDate, Coll, Model){
                   $and: [
                     {
                       createdAt: {
-                        $gt: new Date(startDate)
+                        $gte: new Date(startDate)
                       }
                     }, {
                       createdAt: {
-                        $lt: new Date(endDate)
+                        $lte: new Date(endDate)
                       }
                     }
                   ]
