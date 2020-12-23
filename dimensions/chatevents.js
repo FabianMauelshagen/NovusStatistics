@@ -7,7 +7,7 @@ const ChatEvent = mongoose.model('chatevent', chatEventsSchema)
 
 let startDate = '1991-08-06'
 let endDate = new Date()
-
+//as
 // Get all session interrupts
 function getSessionInterrupts(startDate, endDate) {
   return ChatEvent.aggregate([{
