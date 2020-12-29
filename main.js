@@ -35,6 +35,31 @@ mongoose.connect(
 main.get('/', (req, res) => {
     res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8;'})
     
+         startDate = time.getLastMonth()[0]
+        endDate = time.getLastMonth()[1]  
+        functions.calcDuration(startDate, endDate, chatevent_coll, 1).then(function(array){
+            res.write('chatsessions.getDurations: // Sitzungen (Anzahl Sitzungen die berechnet werden konnten,<br> also Daten zu Beitritt und Austritt vorhanden)' +
+            '<br> und deren Länge (Zeit zwischen erstem Gastbeitritt und letzten Gastaustritt),<br> sowie kürzeste, längste und durchschn. Sitzung <br>')
+             /* for(elem of array[0]){
+                res.write('<br>ID: ' + elem.type)
+                res.write('<br>Start der Funktion: ' + elem.startTime)
+                res.write('<br>Stop der Funktion: ' + elem.stopTime)
+                res.write('<br>Dauer der Nutzung: ' + elem.duration + '<br><br>')
+            }  */
+            res.write('<br>Anzahl Nutzungen: ' + array[1][0])
+            res.write('<br>Kürzeste Nutzung: ' + array[1][1])
+            res.write('<br>Längste Nutzung: ' + array[1][2])
+            res.write('<br>Durchschnittliche Länge: ' + array[1][3])
+        })  
+
+        functions.calcEachDay(startDate, endDate, chatevent_coll, 0).then(function(array){
+            for(elem of array){
+                res.write('<br>Anzahl Nutzungen: ' + elem[1][0])
+                res.write('<br>Kürzeste Nutzung: ' + elem[1][1]) 
+                res.write('<br>Längste Nutzung: ' + elem[1][2])
+                res.write('<br>Durchschnittliche Länge: ' + elem[1][3])
+            }
+        })
 })
 
 main.listen(port, () => {
