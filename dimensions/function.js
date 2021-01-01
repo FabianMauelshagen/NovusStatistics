@@ -271,6 +271,7 @@ function getTimes(startDate, endDate, from, to, Model) {
       })
   }
 
+  // Alle Start und End Zeiten der jeweiligen Funktion zur weiteren Verarbeitung
   function getDurations(startDate, endDate, Model, i){
     return new Promise(function(resolve, reject){
       let types = ['coBrowsingChanged', 'videoChanged', 'whiteBoardChanged', 'screenSharingChanged']
@@ -359,6 +360,7 @@ function getTimes(startDate, endDate, from, to, Model) {
     })
 }
 
+// Verarbeitung der Start und Endzeiten der Funktionen, Berechnung der Dauer sowie Durchschnitt, Min und Max Dauer
 function calcDuration(startDate, endDate, Model, z){
   return new Promise(function(resolve, reject){
     getDurations(startDate, endDate, Model, z).then(function(array){
@@ -390,10 +392,12 @@ function calcDuration(startDate, endDate, Model, z){
           avgDur = new Date((totalDur/i))
           let longestDuration = new Date(long)
           let shortestDuration = new Date(short)
+          let date = new Date(endDate)
           stats[0] = i
           stats[1] = shortestDuration.toLocaleTimeString('de-DE', {timeZone: 'UTC'})
           stats[2] = longestDuration.toLocaleTimeString('de-DE', {timeZone: 'UTC'})
           stats[3] = avgDur.toLocaleTimeString('de-DE', {timeZone: 'UTC'})
+          stats[4] = date
           resolve([durations, stats])
     })
   })
@@ -405,6 +409,7 @@ function calcTime(time){
   return date
 }
 
+// Berechnung der Dauer der Funktionen für einzelne Tage über eine Zeitspanne
 function calcEachDay(startDate, endDate, Model, index){
   return new Promise(async function(resolve, reject){
     let totals = []
@@ -413,7 +418,8 @@ function calcEachDay(startDate, endDate, Model, index){
     let currentStartDate = new Date(endDate)
     while(currentStartDate >= startDate){
             await calcDuration(currentStartDate, currentDate, Model, index).then(function(res){
-                totals[i] = res
+              res[1][4].setDate(currentDate.getDate())
+              totals[i] = res 
             })
         currentStartDate.setDate(currentDate.getDate() - 1)
         currentDate.setDate(currentDate.getDate() - 1)
@@ -449,6 +455,62 @@ function calcEachDay(startDate, endDate, Model, index){
           res.write('<br>Uhrzeit: ' + elem._id + '-' + (elem._id + 1) + ' | Funktionen genutzt: ' + elem.count)
       }
   })   */
+
+  /* // Parameter bestimmen
+    type = 1 // VideoChat
+    startDate = time.getTimeSpan('2020-11-01', '2020-11-07')[0]
+    endDate = time.getTimeSpan('2020-11-01', '2020-11-07')[1] */
+
+    /* // Funktions Dauer über Zeitraum Gesamt mit Durchschnitt, Max und Min
+    functions.calcDuration(startDate, endDate, chatevent_coll, type).then(function (array) {
+        switch (type) {
+            case 0:
+                functionName = 'Co-Browsing'
+                break
+            case 1:
+                functionName = 'Video-Chat'
+                break
+            case 2:
+                functionName = 'Whiteboard'
+                break
+            case 3:
+                functionName = 'Screen-Sharing'
+                break
+        }
+        res.write('<br><b>Funktion: ' + functionName + '</b><br>')
+        if (array[1][0] != 0)
+            res.write('<br><b>Anzahl Nutzungen: ' + array[1][0] +
+                '</b><br><b>Kürzeste Nutzung: ' + array[1][1] +
+                '</b><br><b>Längste Nutzung: ' + array[1][2] +
+                '</b><br><b>Durchschnittliche Länge: ' + array[1][3] +
+                '</b>')
+        else
+            res.write('<br><b>Anzahl Nutzungen: keine Daten' +
+                '</b><br><b>Kürzeste Nutzung: keine Daten' +
+                '</b><br><b>Längste Nutzung: keine Daten' +
+                '</b><br><b>Durchschnittliche Länge: keine Daten</b>')
+        res.write('<br>_____________<br>')
+    }) */
+
+    /* // Funktionsdauer über Zeitraum für jeden einzelnen Tag mit Durchschnitt, Max und Min
+    functions.calcEachDay(startDate, endDate, chatevent_coll, type).then(function (array) {
+        for (elem of array) {
+            if (elem[1][0] != 0)
+                res.write('<br><b>Anzahl Nutzungen: ' + elem[1][0] +
+                    '</b> <br><b>Kürzeste Nutzung: ' + elem[1][1] +
+                    '</b> <br><b>Längste Nutzung: ' + elem[1][2] +
+                    '</b> <br><b>Durchschnittliche Länge: ' + elem[1][3] +
+                    '</b> <br><b>Datum: ' + elem[1][4] +
+                    '</b>')
+            else
+                res.write('<br>Anzahl Nutzungen: ' + elem[1][0] +
+                    '<br>Kürzeste Nutzung: Keine Daten' +
+                    '<br>Längste Nutzung: Keine Daten' +
+                    '<br>Durchschnittliche Länge: Keine Daten' +
+                    '<br>Datum: ' + elem[1][4])
+            res.write('<br>')
+        }
+    }) */
 
 
   module.exports = {getTimes, getBusyTimes, getDurations, calcDuration, calcEachDay};
