@@ -347,7 +347,7 @@ function getTime(date, from, to) {
 }
 
 // Get all chatevents
-router.get('/', async (req, res) => {
+router.get('/getTime', async (req, res) => {
   try {
     res.json(await getTime('2020-08-20', 7, 16))
   } catch (err) {

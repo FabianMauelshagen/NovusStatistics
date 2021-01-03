@@ -1,14 +1,17 @@
 const mongoose = require('mongoose')
 const express = require('express')
-const main = express()
 const port = 3000
 var ObjectId = require('mongodb').ObjectID
 var chatsessions = require('./dimensions/chatsession')
 var users = require('./dimensions/user')
 var time = require('./dimensions/time')
-var guests = require('./dimensions/guest')
+
 var functions = require('./dimensions/function')
 const e = require('express')
+const cors = require('cors')
+const bodyParser = require('body-parser')
+
+
 
 let type = 0
 let functionName = ''
@@ -20,11 +23,17 @@ const user_coll = mongoose.model('users', chatSchema)
 const agentRatings_coll = mongoose.model('agentratings', chatSchema)
 const agentSettings_coll = mongoose.model('agentratingsettings', chatSchema)
 const chatsessions_coll = mongoose.model('chatsessions', chatSchema)
-const sysdiagnostics_coll = mongoose.model('systemdiagnosticdatas', chatSchema)
-const guests_coll = mongoose.model('guests', chatSchema)
+//const sysdiagnostics_coll = mongoose.model('systemdiagnosticdatas', chatSchema)
+//const guests_coll = mongoose.model('guests', chatSchema)
 
 let startDate = '1991-08-06'
 let endDate = new Date()
+
+const app = express()
+
+// Middleware
+app.use(bodyParser.json())
+app.use(cors())
 
 mongoose.connect(
     'mongodb://127.0.0.1:27017/Novus', {
@@ -35,15 +44,23 @@ mongoose.connect(
     }
 )
 
-main.get('/', (req, res) => {
+/* app.get('/', (req, res) => {
     res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8;'
     })
 
     
-})
+})  */
 
-main.listen(port, () => {
+
+
+const chatEventRouter = require('./dimensions/chatevents')
+const guests = require('./dimensions/guest')
+app.use('/chatevents', chatEventRouter)
+app.use('/guests', guests)
+
+app.listen(port, () => {
     console.log(`Listening at http://localhost:${port}`)
-})
+}) 
+
 

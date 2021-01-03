@@ -1,10 +1,18 @@
+const express = require('express')
+const router = express.Router()
+const mongoose = require('mongoose')
+var time = require('./time')
+
+const chatSchema = new mongoose.Schema()
+const sysdiagnostics_coll = mongoose.model('systemdiagnosticdatas', chatSchema)
+const guests_coll = mongoose.model('guests', chatSchema)
 
 // Browser Nutzung
 // i: 0 -> Benutzter Browser, 1 -> Benutztes Betriebssystem, 2 -> Boolean hat Kamera, 3 -> Boolean hat Mikrofon, 4 -> Boolean hat Lautsprecher
-function getUseCounts(startDate, endDate, Model, i){
+function getUseCounts(startDate, endDate, i){
     return new Promise(function(resolve, reject){
         let fields = ['$browserName', '$osName', '$hasCamera', '$hasMicrophone', '$hasSpeakers']
-        Model.aggregate([
+        sysdiagnostics_coll.aggregate([
             {
                 $match: {
                   $and: [
@@ -40,9 +48,9 @@ function getUseCounts(startDate, endDate, Model, i){
 
 // Gesamtzahl an Guests über Zeitspanne
 // Rückgabewert = (number) c -> Count der Guests
-function getTotal(startDate, endDate, Model){
+function getTotal(startDate, endDate){
     return new Promise(function(resolve, reject){
-        Model.aggregate([
+      guests_coll.aggregate([
             {
                 $match: {
                   $and: [
@@ -88,7 +96,7 @@ function getTotal(startDate, endDate, Model){
 //                          result[1][1] = (number) average     -> Durchschnitt Guests / Tag
 //                          result[1][2] = (number) min         -> Kleinste Anzahl Guests Gesamt
 //                          result[1][3] = (number) max         -> Größte Anzahl Guests Gesamt
-function getStats(startDate, endDate, Model){
+function getStats(startDate, endDate){
         return new Promise(async function(resolve, reject){
             let totals = []
             let stats = []
@@ -100,7 +108,7 @@ function getStats(startDate, endDate, Model){
             let currentDate = new Date(endDate)
             let currentStartDate = new Date(endDate)
             while(currentStartDate >= startDate){
-                    await getTotal(currentStartDate, currentDate, Model).then(function(res){
+                    await getTotal(currentStartDate, currentDate).then(function(res){
                         totals[i] = res
                     })
                 currentStartDate.setDate(currentDate.getDate() - 1)
@@ -118,7 +126,10 @@ function getStats(startDate, endDate, Model){
                 total += elem
             }
             avg = Math.round(((total / totals.length) + Number.EPSILON) * 100) / 100
-            stats.push(total, avg, min, max)
+            stats[0] = total
+            stats[1] = avg
+            stats[2] = min
+            stats[3] = max
             resolve([totals, stats])
         })
 }
@@ -158,6 +169,29 @@ function getInviteStats(startDate, endDate, Model){
           })
     })
 }
+
+
+
+let startDate = time.getSpecificDate('2020-01-01')[0]
+let endDate = time.getSpecificDate('2020-10-10')[1]
+
+// User System Statistik (Anzahl Browser Nutzung etc.)
+router.get('/getUseCounts', (req, res) => {
+  try {
+    let type = req.query.i
+    res.json( getUseCounts(startDate, endDate, type))
+  } catch (err) {
+    res.send('Error ' + err)
+  }
+})
+
+router.get('/getStats', (req, res) => {
+  try {
+    res.json(getStats(startDate, endDate))
+  } catch (err) {
+    res.send('Error ' + err)
+  }
+})
 
 
 // Test Aufrufe innerhalb der main.js Datei
@@ -203,4 +237,4 @@ function getInviteStats(startDate, endDate, Model){
         }
     }) */
 
-module.exports = {getUseCounts, getTotal, getStats, getInviteStats};
+module.exports = router;
