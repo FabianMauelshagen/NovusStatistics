@@ -4,11 +4,17 @@
   "description": "praxisprojekt",
   "main": "main.js",
   "dependencies": {
+    "apexcharts": "^3.23.1",
+    "bootstrap-vue": "^2.21.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.10.15"
+    "mongoose": "^5.10.15",
+    "vue-apexcharts": "^1.6.0",
+    "vue-router": "^3.4.9"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint-plugin-react": "^7.22.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

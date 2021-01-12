@@ -1,8 +1,58 @@
 import Vue from 'vue'
+import VueRouter from 'vue-router'
 import App from './App.vue'
+import BootstrapVue from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+import '@/plugins/apexcharts'
+
+import Users from './pages/Users.vue'
+import Home from './pages/Home.vue'
+import ChatSession from './pages/ChatSession.vue'
+import Functions from './pages/Functions.vue'
+import Time from './pages/Time.vue'
+import Guests from './pages/Guests.vue'
+
+Vue.use(VueRouter)
+
+Vue.use(BootstrapVue)
+
+const routes = [
+  {
+    path: '/',
+    component: Home
+  },
+  {
+    path: '/users',
+    component: Users
+  },
+  {
+    path: '/chatsession',
+    component: ChatSession
+  },
+  {
+    path: '/functions',
+    component: Functions
+  },
+  {
+    path: '/time',
+    component: Time
+  },
+  {
+    path: '/guests',
+    component: Guests
+  }
+]
+
+const router = new VueRouter({
+  routes,
+  mode: 'history'
+})
 
 Vue.config.productionTip = false
 
 new Vue({
+  el: '#app',
+  router,
   render: h => h(App),
 }).$mount('#app')

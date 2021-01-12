@@ -1,18 +1,28 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <Guestcomp/>
+    <div id="nav">
+      <b-navbar type="dark" fixed="top" variant="dark">
+        <img id="logo" src="./assets/logo.png">
+        <b-navbar-nav id="nav_body">
+          <router-link tag="b-nav-item" to="/">Home</router-link>
+          <router-link tag="b-nav-item" to="/guests">Guests</router-link>
+          <router-link tag="b-nav-item" to="/chatsession">Chatsession</router-link>
+          <router-link tag="b-nav-item" to="/functions">Functions</router-link>
+          <router-link tag="b-nav-item" to="/time">Time</router-link>
+          <router-link tag="b-nav-item" to="/users">Users</router-link>
+        </b-navbar-nav>
+      </b-navbar>
+    </div>
+    <router-view/>
   </div>
 </template>
 
 <script>
-//import NovusStatistics from './components/NovusStatistics.vue'
-import Guestcomp from './components/guestcomp.vue'
+
 export default {
   name: 'App',
   components: {
-    Guestcomp
-    //NovusStatistics
+
   }
 }
 </script>
@@ -23,7 +33,18 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+
+#nav {
+  margin-bottom: 130px;
+}
+
+#logo {
+  height: 50px;
+  width: 50px;
+}
+
+#nav_body {
+  margin-left: 20px;
 }
 </style>
