@@ -1,60 +1,12 @@
 <template>
     <div class="full-width">
         <p class="topHeader">ChatSession Statistik</p>
-        <b-container>
-            <b-row>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getYesterday();refresh();">Letzter Tag</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getLastWeek();refresh();">Letzte Woche</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getLastSevenDays();refresh();">Letzte 7 Tage</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getLastMonth();refresh();">Letzter Monat</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getLastQuarter();refresh();">Letztes Quartal</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getLastYear();refresh();">Letztes Jahr</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getCurrentMonth();refresh();">Aktueller Monat</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getCurrentQuarter();refresh();">Aktuelles Quartal</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="tbtn" v-on:click="getCurrentYear();refresh();">Aktuelles Jahr</b-button>
-                </b-col>
-            </b-row>
-        </b-container>
-
-        <b-container>
-            <b-row>
-                <b-col>
-                    <b-form-datepicker class="pickBtn" v-model="startDate"
-                        :date-format-options="{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }"
-                        locale="de" placeholder="Kein Datum gewählt" v-on:input="refresh();">
-                    </b-form-datepicker>
-                </b-col>
-                <b-col>
-                    <b-form-datepicker class="pickBtn" v-model="endDate"
-                        :date-format-options="{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }"
-                        locale="de" placeholder="Kein Datum gewählt" v-on:input="setEndDate(); refresh();">
-                    </b-form-datepicker>
-                </b-col>
-            </b-row>
-        </b-container>
-
+        <time-component v-on:date-changed="date = $event; refresh()"></time-component>
         <b-card no-body class="mb-1">
             <b-card-header header-tag="header" class="p-1" role="tab">
-                <b-button block href="#" v-b-toggle.accordion-1 variant="info">Allgemein</b-button>
+                <b-button block @click="collapse1.show = !collapse1.show" variant="dark">Allgemein</b-button>
             </b-card-header>
-            <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
+            <b-collapse v-model="collapse1.show" id="collapse-1" class="mt-2">
                 <b-card-body>
                     <b-row>
                         <b-col>
@@ -85,9 +37,9 @@
 
         <b-card no-body class="mb-1">
             <b-card-header header-tag="header" class="p-1" role="tab">
-                <b-button block href="#" v-b-toggle.accordion-2 variant="info">Behandelte Themen</b-button>
+                <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Behandelte Themen</b-button>
             </b-card-header>
-            <b-collapse id="accordion-2" accordion="my-accordion" role="tabpanel">
+            <b-collapse v-model="collapse2.show" id="collapse-2" class="mt-2">
                 <b-card-body>
                     <b-row>
                         <b-col>
@@ -125,9 +77,9 @@
 
         <b-card no-body class="mb-1">
             <b-card-header header-tag="header" class="p-1" role="tab">
-                <b-button block href="#" v-b-toggle.accordion-3 variant="info">ChatSession Dauer</b-button>
+                <b-button block @click="collapse3.show = !collapse3.show" variant="dark">ChatSession Dauer</b-button>
             </b-card-header>
-            <b-collapse id="accordion-3" accordion="my-accordion" role="tabpanel">
+            <b-collapse v-model="collapse3.show" id="collapse-3" class="mt-2">
                 <b-card-body>
                     <div id="chart" align="center">
                         <apexchart :height="600" :options="chartOptions" :series="series">
@@ -161,19 +113,30 @@ const getUsedFunctionsURL = 'http://localhost:3000/chatsessions/getUsedFunctions
 const ratingsAggregateURL = 'http://localhost:3000/chatsessions/ratingsAggregate'
 
 const time = require('../assets/time')
+import de from "apexcharts/dist/locales/de.json"
+
 
 String.prototype.allReplace = function (obj) {
-    var retStr = this;
+    var retStr = this
     for (var x in obj) {
-        retStr = retStr.replace(new RegExp(x, 'g'), obj[x]);
+        retStr = retStr.replace(new RegExp(x, 'g'), obj[x])
     }
-    return retStr;
-};
+    return retStr
+}
 
 export default {
     name: 'chatsessions',
     data() {
         return {
+            collapse1: {
+                show: false
+            },
+            collapse2: {
+                show: false
+            },
+            collapse3: {
+                show: false
+            },
             series: [],
             gaSeries: [],
             avgStats: [],
@@ -220,7 +183,9 @@ export default {
                     type: 'area',
                     zoom: {
                         enabled: true
-                    }
+                    },
+                    locales: [de],
+                    defaultLocale: "de",
                 },
                 dataLabels: {
                     enabled: false
@@ -240,6 +205,14 @@ export default {
                 },
                 xaxis: {
                     type: 'datetime',
+                    labels: {
+                        datetimeFormatter: {
+                            year: 'yyyy',
+                            month: 'MMM \'yy',
+                            day: 'dddd, dd.MMM.',
+                            hour: 'HH:mm'
+                        },
+                    }
                 },
                 yaxis: {
                     tickAmount: 20
@@ -292,8 +265,10 @@ export default {
                 }
             ],
             error: [],
-            startDate: time.getSpecificDate('2020-11-01')[0],
-            endDate: time.getSpecificDate('2020-11-07')[1]
+            date: {
+                startDate: time.getSpecificDate('2020-11-01')[0],
+                endDate: time.getSpecificDate('2020-11-07')[1]
+            }
         }
     },
     methods: {
@@ -302,8 +277,8 @@ export default {
         getDurations() {
             axios.get(getDurationsURL, {
                 params: {
-                    start: this.startDate,
-                    end: this.endDate
+                    start: this.date.startDate,
+                    end: this.date.endDate
                 }
             }).then(res => {
                 let arr = []
@@ -330,8 +305,8 @@ export default {
         getAvgStats() {
             axios.get(getAvgStatsURL, {
                 params: {
-                    start: this.startDate,
-                    end: this.endDate
+                    start: this.date.startDate,
+                    end: this.date.endDate
                 }
             }).then(res => {
                 this.avgStats = res.data
@@ -347,8 +322,8 @@ export default {
         getUsedFunctions() {
             axios.get(getUsedFunctionsURL, {
                 params: {
-                    start: this.startDate,
-                    end: this.endDate
+                    start: this.date.startDate,
+                    end: this.date.endDate
                 }
             }).then(res => {
                 let arr = res.data
@@ -370,8 +345,8 @@ export default {
         ratingsAggregate() {
             axios.get(ratingsAggregateURL, {
                 params: {
-                    start: this.startDate,
-                    end: this.endDate
+                    start: this.date.startDate,
+                    end: this.date.endDate
                 }
             }).then(res => {
                 this.ratingStats = res.data[1]
@@ -379,6 +354,7 @@ export default {
                 this.maxStats = this.ratingStats[1]
                 let arr = []
                 for (var elem of res.data[0]) {
+                    console.log(elem)
                     arr.push(elem.count)
                     if (elem) {
                         this.ratingOptions.labels.push(elem.title)
@@ -390,47 +366,6 @@ export default {
             })
         },
 
-        getYesterday() {
-            this.startDate = time.getYesterday()[0]
-            this.endDate = time.getYesterday()[1]
-        },
-        getLastSevenDays() {
-            this.startDate = time.getLastSevenDays()[0]
-            this.endDate = time.getLastSevenDays()[1]
-        },
-        getLastWeek() {
-            this.startDate = time.getLastWeek()[0]
-            this.endDate = time.getLastWeek()[1]
-        },
-        getLastMonth() {
-            this.startDate = time.getLastMonth()[0]
-            this.endDate = time.getLastMonth()[1]
-        },
-        getLastQuarter() {
-            this.startDate = time.getLastQuarter()[0]
-            this.endDate = time.getLastQuarter()[1]
-        },
-        getLastYear() {
-            this.startDate = time.getLastYear()[0]
-            this.endDate = time.getLastYear()[1]
-        },
-        getCurrentMonth() {
-            this.startDate = time.getCurrentMonth()[0]
-            this.endDate = time.getCurrentMonth()[1]
-        },
-        getCurrentQuarter() {
-            this.startDate = time.getCurrentQuarter()[0]
-            this.endDate = time.getCurrentQuarter()[1]
-        },
-        getCurrentYear() {
-            this.startDate = time.getCurrentYear()[0]
-            this.endDate = time.getCurrentYear()[1]
-        },
-        setEndDate() {
-            let end = this.endDate
-            this.endDate = time.getSpecificDate(end)[1]
-        },
-
         async refresh() {
             this.ratingOptions.labels.length = 0
             this.getDurations()
@@ -438,10 +373,6 @@ export default {
             this.getUsedFunctions()
             this.ratingsAggregate()
         },
-    },
-    mounted() {
-
-
     },
     created() {
         this.refresh()
@@ -495,16 +426,6 @@ tr:nth-child(even) {
     background-color: #343a40;
 }
 
-.tbtn {
-    background-color: #343a40;
-    margin: 2px;
-    margin-bottom: 5px;
-}
-
-.pickBtn {
-    margin-bottom: 5px;
-}
-
 .full-width {
     padding-right: 50px;
     padding-left: 50px;
@@ -549,9 +470,9 @@ button.page-link {
 }
 
 .topHeader {
-  text-align: center;
-  color: #343a40;
-  font-size: 50px;
-  font-weight: bold;
+    text-align: center;
+    color: #343a40;
+    font-size: 50px;
+    font-weight: bold;
 }
 </style>

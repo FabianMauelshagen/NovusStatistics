@@ -22,7 +22,6 @@
 export default {
   name: 'App',
   components: {
-
   }
 }
 </script>
@@ -46,5 +45,9 @@ export default {
 
 #nav_body {
   margin-left: 20px;
+}
+
+body {
+    overflow-y: scroll;
 }
 </style>

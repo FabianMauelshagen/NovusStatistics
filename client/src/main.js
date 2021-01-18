@@ -13,6 +13,8 @@ import Functions from './pages/Functions.vue'
 import Time from './pages/Time.vue'
 import Guests from './pages/Guests.vue'
 
+import timeComponent from './components/time-component.vue'
+
 Vue.use(VueRouter)
 
 Vue.use(BootstrapVue)
@@ -50,6 +52,7 @@ const router = new VueRouter({
 })
 
 Vue.config.productionTip = false
+Vue.component('time-component', timeComponent)
 
 new Vue({
   el: '#app',

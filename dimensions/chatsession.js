@@ -533,6 +533,8 @@ router.get('/ratingsAggregate', async (req, res) => {
   }
 })
 
+
+
 // Test Aufrufe innerhalb der main.js Datei
 
 

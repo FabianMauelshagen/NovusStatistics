@@ -1,60 +1,12 @@
 <template>
   <div class="full-width">
     <p class="topHeader">Kunden Statistik</p>
-    <b-container>
-      <b-row>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getYesterday();refresh();">Letzter Tag</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getLastWeek();refresh();">Letzte Woche</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getLastSevenDays();refresh();">Letzte 7 Tage</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getLastMonth();refresh();">Letzter Monat</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getLastQuarter();refresh();">Letztes Quartal</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getLastYear();refresh();">Letztes Jahr</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getCurrentMonth();refresh();">Aktueller Monat</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getCurrentQuarter();refresh();">Aktuelles Quartal</b-button>
-        </b-col>
-        <b-col>
-          <b-button class="tbtn" v-on:click="getCurrentYear();refresh();">Aktuelles Jahr</b-button>
-        </b-col>
-      </b-row>
-    </b-container>
-
-    <b-container>
-      <b-row>
-        <b-col>
-          <b-form-datepicker class="pickBtn" v-model="startDate"
-            :date-format-options="{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }" locale="de"
-            placeholder="Kein Datum gewählt" v-on:input="refresh()">
-          </b-form-datepicker>
-        </b-col>
-        <b-col>
-          <b-form-datepicker class="pickBtn" v-model="endDate"
-            :date-format-options="{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }" locale="de"
-            placeholder="Kein Datum gewählt" v-on:input="setEndDate(); refresh()">
-          </b-form-datepicker>
-        </b-col>
-      </b-row>
-    </b-container>
-
+    <time-component v-on:date-changed="date = $event; refresh()"></time-component>
     <b-card no-body class="mb-1">
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle.accordion-1 variant="info">Systemdiagnose</b-button>
+        <b-button block @click="collapse1.show = !collapse1.show" variant="dark">Systemdiagnose</b-button>
       </b-card-header>
-      <b-collapse id="accordion-1" accordion="my-accordion" role="tabpanel">
+      <b-collapse v-model="collapse1.show" id="collapse-1" class="mt-2">
         <b-card-body>
           <b-row>
             <b-col v-for="el in statsIndex" v-bind:key="el[0]" align="center">
@@ -72,12 +24,12 @@
 
     <b-card no-body class="mb-1">
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle.accordion-2 variant="info">Kundenaufkommen</b-button>
+        <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Kundenaufkommen</b-button>
       </b-card-header>
-      <b-collapse id="accordion-2" accordion="my-accordion" role="tabpanel">
+      <b-collapse v-model="collapse2.show" id="collapse-2" class="mt-2">
         <b-card-body>
           <div id="chart">
-            <apexchart :height="500" :options="statsChartOptions" :series="statsSeries"></apexchart>
+            <apexchart ref="statChart" :height="500" :options="statsChartOptions" :series="statsSeries"></apexchart>
           </div>
           <b-row>
             <b-col>
@@ -99,9 +51,9 @@
 
     <b-card no-body class="mb-1">
       <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle.accordion-3 variant="info">Screen-Sharing Annahme</b-button>
+        <b-button block @click="collapse3.show = !collapse3.show" variant="dark">Screen-Sharing Annahme</b-button>
       </b-card-header>
-      <b-collapse id="accordion-3" accordion="my-accordion" role="tabpanel">
+      <b-collapse v-model="collapse3.show" id="collapse-3" class="mt-2">
         <b-card-body>
           <div id="chart" align="center">
             <apexchart type="pie" width="380" :options="inviteChartOptions" :series="inviteSeries">
@@ -119,11 +71,21 @@ const getUseCountURL = 'http://localhost:3000/guests/getUseCounts'
 const getStatsURL = 'http://localhost:3000/guests/getStats'
 const inviteStatsURL = 'http://localhost:3000/guests/getInviteStats'
 const time = require('../assets/time')
+import de from "apexcharts/dist/locales/de.json"
 
 export default {
   name: 'guests',
   data() {
     return {
+      collapse1: {
+        show: false
+      },
+      collapse2: {
+        show: false
+      },
+      collapse3: {
+        show: false
+      },
       series: [{
           data: []
         },
@@ -162,10 +124,14 @@ export default {
       statsChartOptions: {
         chart: {
           type: 'area',
+
           zoom: {
             enabled: true
-          }
+          },
+          locales: [de],
+          defaultLocale: "de",
         },
+
         dataLabels: {
           enabled: false
         },
@@ -182,8 +148,17 @@ export default {
             opacity: 0.5
           },
         },
+
         xaxis: {
           type: 'datetime',
+          labels: {
+            datetimeFormatter: {
+              year: 'yyyy',
+              month: 'MMM \'yy',
+              day: 'dddd, dd.MMM.',
+              hour: 'HH:mm'
+            },
+          }
         },
         theme: {
           palette: 'palette6'
@@ -213,7 +188,7 @@ export default {
           position: 'bottom',
           horizontalAlign: 'center',
         },
-        labels: [],
+        labels: ['Angenommen', 'Abgelehnt']
       },
       inviteStats: [],
       error: [],
@@ -226,8 +201,10 @@ export default {
         [3, 'Mikrofon'],
         [4, 'Lautsprecher']
       ],
-      startDate: time.getSpecificDate('2020-11-01')[0],
-      endDate: time.getSpecificDate('2020-11-07')[1]
+      date: {
+        startDate: time.getSpecificDate('2020-11-01')[0],
+        endDate: time.getSpecificDate('2020-11-07')[1]
+      }
     }
   },
   methods: {
@@ -235,8 +212,8 @@ export default {
       for (let j = 0; j < this.statsIndex.length; j++) {
         axios.get(getUseCountURL, {
           params: {
-            start: this.startDate,
-            end: this.endDate,
+            start: this.date.startDate,
+            end: this.date.endDate,
             i: j
           }
         }).then(res => {
@@ -260,8 +237,8 @@ export default {
     getStats() {
       axios.get(getStatsURL, {
         params: {
-          start: this.startDate,
-          end: this.endDate
+          start: this.date.startDate,
+          end: this.date.endDate
         }
       }).then(res => {
         this.statsValues = res.data[1]
@@ -281,72 +258,30 @@ export default {
     getInviteStats() {
       axios.get(inviteStatsURL, {
         params: {
-          start: this.startDate,
-          end: this.endDate
+          start: this.date.startDate,
+          end: this.date.endDate
         }
       }).then(res => {
-        this.inviteStats = res.data
-        for (var elem of res.data) {
-          this.inviteSeries.push(elem.count)
-          if (elem._id) {
-            this.inviteChartOptions.labels.push(elem._id)
-          }
-
+        let arr = []
+        for (var invite of res.data) {
+          arr.push(invite.count)
         }
+        this.inviteSeries = arr
       }).catch(e => {
         this.error.push(e)
       })
     },
 
-    getYesterday() {
-      this.startDate = time.getYesterday()[0]
-      this.endDate = time.getYesterday()[1]
-    },
-    getLastSevenDays() {
-      this.startDate = time.getLastSevenDays()[0]
-      this.endDate = time.getLastSevenDays()[1]
-    },
-    getLastWeek() {
-      this.startDate = time.getLastWeek()[0]
-      this.endDate = time.getLastWeek()[1]
-    },
-    getLastMonth() {
-      this.startDate = time.getLastMonth()[0]
-      this.endDate = time.getLastMonth()[1]
-    },
-    getLastQuarter() {
-      this.startDate = time.getLastQuarter()[0]
-      this.endDate = time.getLastQuarter()[1]
-    },
-    getLastYear() {
-      this.startDate = time.getLastYear()[0]
-      this.endDate = time.getLastYear()[1]
-    },
-    getCurrentMonth() {
-      this.startDate = time.getCurrentMonth()[0]
-      this.endDate = time.getCurrentMonth()[1]
-    },
-    getCurrentQuarter() {
-      this.startDate = time.getCurrentQuarter()[0]
-      this.endDate = time.getCurrentQuarter()[1]
-    },
-    getCurrentYear() {
-      this.startDate = time.getCurrentYear()[0]
-      this.endDate = time.getCurrentYear()[1]
-    },
-    setEndDate() {
-      let end = this.endDate
-      this.endDate = time.getSpecificDate(end)[1]
-    },
+
 
     async refresh() {
       for (let i = this.series.length - 1; i >= 0; i--) {
         this.series[i].data.length = 0
         this.chartOptions[i].labels.length = 0
       }
-
       this.statsSeries.length = 0
       this.dataSeries.length = 0
+      this.inviteSeries.length = 0
 
       this.getInviteStats()
       this.getUseCounts()
@@ -369,6 +304,7 @@ export default {
         },
       })
     }
+
   },
   created() {
 
@@ -378,19 +314,21 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
   display: inline-block;
   margin: 0 10px;
 }
+
 a {
   color: #ffffff;
 }
@@ -401,7 +339,8 @@ table {
   width: 100%;
 }
 
-td, th {
+td,
+th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
@@ -415,53 +354,47 @@ tr:nth-child(even) {
   background-color: #444444;
 }
 
-.tbtn {
-    background-color: #343a40;
-    margin: 2px;
-    margin-bottom: 5px;
-}
-
-.pickBtn {
-    margin-bottom: 5px;
-}
-
 .full-width {
   padding-right: 50px;
   padding-left: 50px;
 }
 
-.btn.btn-info.btn-block.collapsed, .btn.btn-info.btn-block.not-collapsed {
+.btn.btn-info.btn-block.collapsed,
+.btn.btn-info.btn-block.not-collapsed {
   background-color: #343a40;
   color: #ffffff;
   border: none;
   box-shadow: none;
 }
 
-.btn:focus{
-    box-shadow: none
+.btn:focus {
+  box-shadow: none
 }
 
 span {
-    margin-left: 20px;
+  margin-left: 20px;
 }
 
 button.page-link {
   display: inline-block;
 }
+
 button.page-link {
-    font-size: 20px;
-    color: #29b3ed;
-    font-weight: 500;
+  font-size: 20px;
+  color: #29b3ed;
+  font-weight: 500;
 }
-.offset{
+
+.offset {
   width: 500px !important;
-  margin: 20px auto;  
+  margin: 20px auto;
 }
-.list-group{
-    max-height: 600px;
-    margin-bottom: 20px;
-    overflow:auto;
-    border: 1px solid #ddd;
+
+.list-group {
+  max-height: 600px;
+  margin-bottom: 20px;
+  overflow: auto;
+  border: 1px solid #ddd;
 }
 
 .topHeader {
