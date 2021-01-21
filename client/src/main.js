@@ -10,7 +10,6 @@ import Users from './pages/Users.vue'
 import Home from './pages/Home.vue'
 import ChatSession from './pages/ChatSession.vue'
 import Functions from './pages/Functions.vue'
-import Time from './pages/Time.vue'
 import Guests from './pages/Guests.vue'
 
 import timeComponent from './components/time-component.vue'
@@ -35,10 +34,6 @@ const routes = [
   {
     path: '/functions',
     component: Functions
-  },
-  {
-    path: '/time',
-    component: Time
   },
   {
     path: '/guests',

@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const { send, emit } = require('process');
-var ObjectId = require('mongodb').ObjectID;
+const express = require('express')
+const router = express.Router()
+const Model = require('../dimensions/models')
 
 
 // User finden über bestimmte Feld ((String) field) und ensprechenden Wert ((String) value)
@@ -22,9 +22,8 @@ function getUser(Model, field, value){
 }
 
 // Get all session interrupts
-function getSessionInterrupts(startDate, endDate, Model) {
-    return new Promise(function(resolve, reject){
-        Model.aggregate([{
+function getSessionInterrupts(startDate, endDate) {
+    return Model.chatevent_coll.aggregate([{
             $match: {
               $and: [{
                 createdAt: {
@@ -110,16 +109,12 @@ function getSessionInterrupts(startDate, endDate, Model) {
               'username': 1
             }
           }
-        ], function(err, result){
-            resolve(result)
-        })
-    })
+        ])
   }
 
   // Get frequency of a problem acceptance by a user
-function getFrequencyOfAcceptance(startDate, endDate, Model) {
-    return new Promise(function(resolve, reject){
-        Model.aggregate([{
+function getFrequencyOfAcceptance(startDate, endDate) {
+    return Model.chatevent_coll.aggregate([{
             $match: {
               $and: [{
                 createdAt: {
@@ -182,16 +177,12 @@ function getFrequencyOfAcceptance(startDate, endDate, Model) {
             '$sort': {
               'username': 1
             }
-          }], function(err, result){
-              resolve(result)
-          })
-    })
+          }])
   }
 
   // Get Used Functions Count per User 
-  function getUsedFunctions(startDate, endDate, Model) {
-    return new Promise(function(resolve, reject){
-        Model.aggregate([{
+  function getUsedFunctions(startDate, endDate) {
+       return Model.chatevent_coll.aggregate([{
             $match: {
               $and: [{
                 createdAt: {
@@ -299,11 +290,96 @@ function getFrequencyOfAcceptance(startDate, endDate, Model) {
               'username': 1, 
               'type': 1
             }
-          }], function(err, result){
-              resolve(result)
-          })
-    })
+          }])
   }
+
+  function replace(str) {
+    let i = 0
+    str = str.substr(0, (str.length/2))
+    i = str.length
+    for(i; i < 8; i++){
+      str = str + '*'
+    }
+    return str
+  }
+
+  async function getUsedFunctionsLoop(startDate, endDate) {
+    let functions = [{
+      type: 'videoChanged',
+      name: 'Video-Chat',
+      values: []
+    }, {
+      type: 'coBrowsingChanged',
+      name: 'Co-Browsing',
+      values: []
+    }, {
+      type: 'screenSharingChanged',
+      name: 'Screen-Sharing',
+      values: []
+    }]
+    const res = await getUsedFunctions(startDate, endDate)
+    let last = 0
+    let users = []
+    for (functElem of functions) {
+      let i = -1
+      let lastUser = ''
+      for (el of res) {
+        if (el.username !== lastUser) {
+          lastUser = el.username
+          if(last == functions.length-1){
+            users.push(replace(lastUser))
+          } 
+          i++
+        }
+        if (el.type === functElem.type) {
+          functElem.values[i] = el.count
+        }
+      }
+      last++
+    }
+  
+    for (functElem of functions) {
+      let z = 0
+      for (val of functElem.values) {
+        if (!val) {
+          functElem.values[z] = 0
+        }
+        z++
+      }
+    }
+    return [functions, users]
+  }
+  
+  router.get('/getSessionInterrupts', async (req, res) => {
+    try {
+      let startDate = req.query.start
+      let endDate = req.query.end
+      res.json(await getSessionInterrupts(startDate, endDate))
+    } catch (err) {
+      res.send('Error ' + err)
+    }
+  })
+  
+  router.get('/getFrequencyOfAcceptance', async (req, res) => {
+    try {
+      let startDate = req.query.start
+      let endDate = req.query.end
+      res.json(await getFrequencyOfAcceptance(startDate, endDate))
+    } catch (err) {
+      res.send('Error ' + err)
+    }
+  })
+  
+  router.get('/getUsedFunctions', async (req, res) => {
+    try {
+      let startDate = req.query.start
+      let endDate = req.query.end
+      res.json(await getUsedFunctionsLoop(startDate, endDate))
+    } catch (err) {
+      res.send('Error ' + err)
+    }
+  })
+
 
 // Aufruf bzw Verwendung in main.js:
 
@@ -336,4 +412,4 @@ function getFrequencyOfAcceptance(startDate, endDate, Model) {
             res.write('<br>Type: ' + elem.type + ' | Count: ' + elem.count + ' | Berater: ' + elem.username)
         }
     }) */
-module.exports = {getUser, getFrequencyOfAcceptance, getUsedFunctions, getSessionInterrupts};
+module.exports = router;

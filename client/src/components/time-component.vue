@@ -3,31 +3,31 @@
     <b-container>
       <b-row>
         <b-col>
-          <b-button class="tbtn" v-on:click="getYesterday()">Letzter Tag</b-button>
+          <b-button class="tbtn" :disabled="isLoading[0]" v-on:click="clicked(0); getYesterday()">Letzter Tag</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getLastWeek()">Letzte Woche</b-button>
+          <b-button class="tbtn" :disabled="isLoading[1]" v-on:click="clicked(1); getLastWeek()">Letzte Woche</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getLastSevenDays()">Letzte 7 Tage</b-button>
+          <b-button class="tbtn" :disabled="isLoading[2]" v-on:click="clicked(2); getLastSevenDays()">Letzte 7 Tage</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getLastMonth()">Letzter Monat</b-button>
+          <b-button class="tbtn" :disabled="isLoading[3]" v-on:click="clicked(3); getLastMonth()">Letzter Monat</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getLastQuarter()">Letztes Quartal</b-button>
+          <b-button class="tbtn" :disabled="isLoading[4]" v-on:click="clicked(4); getCurrentMonth()">Aktueller Monat</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getLastYear()">Letztes Jahr</b-button>
+          <b-button class="tbtn" :disabled="isLoading[5]" v-on:click="clicked(5); getLastQuarter()">Letztes Quartal</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getCurrentMonth()">Aktueller Monat</b-button>
+          <b-button class="tbtn" :disabled="isLoading[6]" v-on:click="clicked(6); getCurrentQuarter()">Aktuelles Quartal</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getCurrentQuarter()">Aktuelles Quartal</b-button>
+          <b-button class="tbtn" :disabled="isLoading[7]" v-on:click="clicked(7); getLastYear()">Letztes Jahr</b-button>
         </b-col>
         <b-col>
-          <b-button class="tbtn" v-on:click="getCurrentYear()">Aktuelles Jahr</b-button>
+          <b-button class="tbtn" :disabled="isLoading[8]" v-on:click="clicked(8); getCurrentYear()">Aktuelles Jahr</b-button>
         </b-col>
       </b-row>
     </b-container>
@@ -57,6 +57,9 @@ export default {
 
   data() {
     return {
+      isLoading: [
+        null, null, null, null, null, null, null, null, null
+      ],
       date: {
         startDate: new Date(),
         endDate: new Date()
@@ -65,6 +68,12 @@ export default {
   },
 
   methods: {
+    clicked(val) {
+      for (let i = 0; i < this.isLoading.length; i++) {
+        this.isLoading[i] = false
+        this.isLoading[val] = true
+      }
+    },
     getYesterday() {
       this.date.startDate = time.getYesterday()[0]
       this.date.endDate = time.getYesterday()[1]
@@ -86,8 +95,8 @@ export default {
       this.date.endDate = time.getLastQuarter()[1]
     },
     getLastYear() {
-      this.date.startDate = time.getLastYear()[0]
-      this.date.endDate = time.getLastYear()[1]
+        this.date.startDate = time.getLastYear()[0]
+        this.date.endDate = time.getLastYear()[1]
     },
     getCurrentMonth() {
       this.date.startDate = time.getCurrentMonth()[0]
@@ -112,9 +121,8 @@ export default {
 
   watch: {
     date:{
-      handler: function(newVal) { 
-        this.$emit('date-changed', newVal)
-        
+      handler: function(newVal) {
+          this.$emit('date-changed', newVal)
       },
       deep: true
    }

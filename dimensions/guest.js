@@ -140,8 +140,7 @@ function getStats(startDate, endDate) {
 
 // Annahme / Ablehnung der Screensharing Einladung
 function getInviteStats(startDate, endDate) {
-  return new Promise(function (resolve, reject) {
-    Model.chatevent_coll.aggregate([{
+    return Model.chatevent_coll.aggregate([{
       $match: {
         $and: [{
           createdAt: {
@@ -164,10 +163,11 @@ function getInviteStats(startDate, endDate) {
           $sum: 1
         }
       }
-    }], function (err, result) {
-      resolve(result)
-    })
-  })
+    }, {
+      $sort: {
+        _id: 1
+      }
+    }])
 }
 
 

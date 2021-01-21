@@ -2,67 +2,11 @@
   <div class="full-width">
     <p class="topHeader">Kunden Statistik</p>
     <time-component v-on:date-changed="date = $event; refresh()"></time-component>
-    <b-card no-body class="mb-1">
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block @click="collapse1.show = !collapse1.show" variant="dark">Systemdiagnose</b-button>
-      </b-card-header>
-      <b-collapse v-model="collapse1.show" id="collapse-1" class="mt-2">
-        <b-card-body>
-          <b-row>
-            <b-col v-for="el in statsIndex" v-bind:key="el[0]" align="center">
-              <div id="chart">
-                <apexchart ref="chart" type="pie" width="450" :options="chartOptions[el[0]]"
-                  :series="series[el[0]].data">
-                </apexchart>
-              </div>
-            </b-col>
-            <b-col></b-col>
-          </b-row>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-
-    <b-card no-body class="mb-1">
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Kundenaufkommen</b-button>
-      </b-card-header>
-      <b-collapse v-model="collapse2.show" id="collapse-2" class="mt-2">
-        <b-card-body>
-          <div id="chart">
-            <apexchart ref="statChart" :height="500" :options="statsChartOptions" :series="statsSeries"></apexchart>
-          </div>
-          <b-row>
-            <b-col>
-              <p :v-model="statsValues[0]"><b>Gesamt: {{statsValues[0]}}</b></p>
-            </b-col>
-            <b-col>
-              <p :v-model="statsValues[1]"><b>Durchschnitt: {{statsValues[1]}}</b></p>
-            </b-col>
-            <b-col>
-              <p :v-model="statsValues[2]"><b>Min: {{statsValues[2]}}</b></p>
-            </b-col>
-            <b-col>
-              <p :v-model="statsValues[3]"><b>Max: {{statsValues[3]}}</b></p>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-
-    <b-card no-body class="mb-1">
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block @click="collapse3.show = !collapse3.show" variant="dark">Screen-Sharing Annahme</b-button>
-      </b-card-header>
-      <b-collapse v-model="collapse3.show" id="collapse-3" class="mt-2">
-        <b-card-body>
-          <div id="chart" align="center">
-            <apexchart type="pie" width="380" :options="inviteChartOptions" :series="inviteSeries">
-            </apexchart>
-          </div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+    <Card :n=type.length chart-type="pie" :new-series="pieSeries" :new-labels="pieLabels" card-text="Systemdiagnose" :new-names="statsNames" />
+    <Card chart-type="line" :new-series="statsSeries" :new-labels="statsValues" card-text="Kundenaufkommen"/>
+    <Card :n=1 chart-type="pie" :new-series="[inviteSeries]" :new-labels="[inviteLabels]" card-text="Screen-Sharing Annahme" :new-names="['Screen-Sharing']"/>
   </div>
+
 </template>
 
 <script>
@@ -71,10 +15,13 @@ const getUseCountURL = 'http://localhost:3000/guests/getUseCounts'
 const getStatsURL = 'http://localhost:3000/guests/getStats'
 const inviteStatsURL = 'http://localhost:3000/guests/getInviteStats'
 const time = require('../assets/time')
-import de from "apexcharts/dist/locales/de.json"
+import Card from '../components/Card'
 
 export default {
   name: 'guests',
+  components: {
+    Card
+  },
   data() {
     return {
       collapse1: {
@@ -86,120 +33,38 @@ export default {
       collapse3: {
         show: false
       },
-      series: [{
-          data: []
-        },
-        {
-          data: []
-        },
-        {
-          data: []
-        },
-        {
-          data: []
-        },
-        {
-          data: []
-        }
+      pieSeries: [
+        [],
+        [],
+        [],
+        [],
+        []
       ],
+      pieLabels: [
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      lineSeries: [],
+      lineLabels: [],
       dataSeries: [],
       statsSeries: [],
       statsValues: [],
-      chartOptions: [{
-          labels: [],
-        },
-        {
-          labels: [],
-        },
-        {
-          labels: [],
-        },
-        {
-          labels: [],
-        },
-        {
-          labels: [],
-        }
-      ],
-      statsChartOptions: {
-        chart: {
-          type: 'area',
 
-          zoom: {
-            enabled: true
-          },
-          locales: [de],
-          defaultLocale: "de",
-        },
-
-        dataLabels: {
-          enabled: false
-        },
-        stroke: {
-          curve: 'straight'
-        },
-        title: {
-          text: 'Kundenaufkommen',
-          align: 'left'
-        },
-        grid: {
-          row: {
-            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-            opacity: 0.5
-          },
-        },
-
-        xaxis: {
-          type: 'datetime',
-          labels: {
-            datetimeFormatter: {
-              year: 'yyyy',
-              month: 'MMM \'yy',
-              day: 'dddd, dd.MMM.',
-              hour: 'HH:mm'
-            },
-          }
-        },
-        theme: {
-          palette: 'palette6'
-        },
-        fill: {
-          type: 'gradient',
-          gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.7,
-            opacityTo: 0.9,
-            stops: [50, 100]
-          }
-        },
-
-      },
       inviteSeries: [],
-      inviteChartOptions: {
-        title: {
-          text: "Screen-Sharing Annahme",
-          align: 'center'
-        },
-        theme: {
-          mode: 'light',
-          palette: 'palette3'
-        },
-        legend: {
-          position: 'bottom',
-          horizontalAlign: 'center',
-        },
-        labels: ['Angenommen', 'Abgelehnt']
-      },
+      inviteLabels: ['Angenommen', 'Abgelehnt'],
       inviteStats: [],
       error: [],
       selected: 0,
       type: [0, 1, 2, 3, 4],
-      statsIndex: [
-        [0, 'Browser'],
-        [1, 'Betriebssystem'],
-        [2, 'Kamera'],
-        [3, 'Mikrofon'],
-        [4, 'Lautsprecher']
+      statsNames: [
+        'Browser',
+        'Betriebssystem',
+        'Kamera',
+        'Mikrofon',
+        'Lautsprecher'
       ],
       date: {
         startDate: time.getSpecificDate('2020-11-01')[0],
@@ -208,32 +73,40 @@ export default {
     }
   },
   methods: {
-    getUseCounts() {
-      for (let j = 0; j < this.statsIndex.length; j++) {
+
+      getUseCounts() {
+      for (let i = 0; i < this.type.length; i++) {
         axios.get(getUseCountURL, {
           params: {
             start: this.date.startDate,
             end: this.date.endDate,
-            i: j
+            i: i
           }
         }).then(res => {
-          for (let i = 0; i < this.statsIndex.length + 1; i++) {
-            this.series[j].data.push(res.data[i].count)
-            if (res.data[i]._id) {
-              if (res.data[i]._id == 'false')
-                this.chartOptions[j].labels.push('Besitzt nicht')
-              else if (res.data[i]._id == 'true')
-                this.chartOptions[j].labels.push('Besitzt')
-              else
-                this.chartOptions[j].labels.push(res.data[i]._id)
-            } else
-              this.chartOptions[j].labels.push('k.A.')
+          if(res.data.length !== 0){
+            res.data.forEach(element => {
+              this.pieSeries[i].push(element.count)
+              if (element._id) {
+                if (element._id === 'false')
+                  this.pieLabels[i].push('Besitzt nicht')
+               else if (element._id === 'true')
+                  this.pieLabels[i].push('Besitzt')
+                else
+                  this.pieLabels[i].push(element._id)
+              } else
+              this.pieLabels[i].push('k.A.')
+          });
+          } else {
+            this.pieSeries[i].push()
           }
+          
+          
         }).catch(e => {
           this.error.push(e)
         })
       }
     },
+
     getStats() {
       axios.get(getStatsURL, {
         params: {
@@ -262,22 +135,23 @@ export default {
           end: this.date.endDate
         }
       }).then(res => {
-        let arr = []
+        let countData = []
         for (var invite of res.data) {
-          arr.push(invite.count)
+          countData.push(invite.count)
+          if (res.data.length < 2) {
+            countData.push(0)
+          }
         }
-        this.inviteSeries = arr
+          this.inviteSeries = countData
       }).catch(e => {
         this.error.push(e)
       })
     },
 
-
-
-    async refresh() {
-      for (let i = this.series.length - 1; i >= 0; i--) {
-        this.series[i].data.length = 0
-        this.chartOptions[i].labels.length = 0
+    refresh() {
+      for (let i = 0; i < this.pieLabels.length; i++) {
+        this.pieSeries[i].length = 0
+        this.pieLabels[i].length = 0
       }
       this.statsSeries.length = 0
       this.dataSeries.length = 0
@@ -287,24 +161,12 @@ export default {
       this.getUseCounts()
       this.getStats()
     },
+    resize() {
+            window.dispatchEvent(new Event('resize'))
+    },
   },
   mounted() {
-    for (let i = 0; i < this.statsIndex.length; i++) {
-      this.$refs.chart[i].updateOptions({
-        title: {
-          text: this.statsIndex[i][1],
-          align: 'center'
-        },
-        theme: {
-          mode: 'light',
-          palette: 'palette3'
-        },
-        legend: {
-          position: 'bottom'
-        },
-      })
-    }
-
+    this.resize()
   },
   created() {
 

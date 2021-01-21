@@ -30,6 +30,7 @@ app.use('/chatevents', chatEventRouter)
 app.use('/guests', guests)
 app.use('/chatsessions', chatSessions)
 app.use('/functions', functions)
+app.use('/users', users)
 
 app.listen(port, () => {
     console.log(`Listening at http://localhost:${port}`)

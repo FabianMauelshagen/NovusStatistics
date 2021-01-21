@@ -1,10 +1,10 @@
 <template>
     <div class="full-width">
-        <p class="topHeader">ChatSession Statistik</p>
+        <p class="topHeader">Sitzungs Statistik</p>
         <time-component v-on:date-changed="date = $event; refresh()"></time-component>
         <b-card no-body class="mb-1">
             <b-card-header header-tag="header" class="p-1" role="tab">
-                <b-button block @click="collapse1.show = !collapse1.show" variant="dark">Allgemein</b-button>
+                <b-button block @click="collapse1.show = !collapse1.show; resize()" variant="dark">Allgemein</b-button>
             </b-card-header>
             <b-collapse v-model="collapse1.show" id="collapse-1" class="mt-2">
                 <b-card-body>
@@ -20,7 +20,7 @@
                                 <apexchart type="pie" width="450" :options="gaChartOptions" :series="gaSeries">
                                 </apexchart>
                             </div>
-                            <p :v-model="avgStats[0]"><b>Sitzungen:</b> {{avgStats[0]}} </p>
+                            <p class="topP" :v-model="avgStats[0]"><b>Sitzungen:</b> {{avgStats[0]}} </p>
 
                             <p :v-model="avgStats[1]"><b>Gäste Gesamt:</b> {{avgStats[1]}} <span
                                     :v-model="avgStats[2]"><b>Pro Sitzung:</b>
@@ -37,7 +37,7 @@
 
         <b-card no-body class="mb-1">
             <b-card-header header-tag="header" class="p-1" role="tab">
-                <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Behandelte Themen</b-button>
+                <b-button block @click="collapse2.show = !collapse2.show; resize()" variant="dark">Behandelte Themen</b-button>
             </b-card-header>
             <b-collapse v-model="collapse2.show" id="collapse-2" class="mt-2">
                 <b-card-body>
@@ -74,34 +74,9 @@
                 </b-card-body>
             </b-collapse>
         </b-card>
+        
+        <Card chart-type="line" :new-series="series" :new-labels="durationStats" card-text="Sitzungs Dauer"/>
 
-        <b-card no-body class="mb-1">
-            <b-card-header header-tag="header" class="p-1" role="tab">
-                <b-button block @click="collapse3.show = !collapse3.show" variant="dark">ChatSession Dauer</b-button>
-            </b-card-header>
-            <b-collapse v-model="collapse3.show" id="collapse-3" class="mt-2">
-                <b-card-body>
-                    <div id="chart" align="center">
-                        <apexchart :height="600" :options="chartOptions" :series="series">
-                        </apexchart>
-                    </div>
-                    <b-row>
-                        <b-col>
-                            <p :v-model="durationStats[0]"><b>Gesamt: {{durationStats[0]}}</b></p>
-                        </b-col>
-                        <b-col>
-                            <p :v-model="durationStats[1]"><b>Durchschnitt: {{durationStats[1]}}</b></p>
-                        </b-col>
-                        <b-col>
-                            <p :v-model="durationStats[2]"><b>Min: {{durationStats[2]}}</b></p>
-                        </b-col>
-                        <b-col>
-                            <p :v-model="durationStats[3]"><b>Max: {{durationStats[3]}}</b></p>
-                        </b-col>
-                    </b-row>
-                </b-card-body>
-            </b-collapse>
-        </b-card>
     </div>
 </template>
 
@@ -111,9 +86,9 @@ const getDurationsURL = 'http://localhost:3000/chatsessions/getDurations'
 const getAvgStatsURL = 'http://localhost:3000/chatsessions/getAvgStats'
 const getUsedFunctionsURL = 'http://localhost:3000/chatsessions/getUsedFunctions'
 const ratingsAggregateURL = 'http://localhost:3000/chatsessions/ratingsAggregate'
-
+import Card from '../components/Card'
 const time = require('../assets/time')
-import de from "apexcharts/dist/locales/de.json"
+
 
 
 String.prototype.allReplace = function (obj) {
@@ -126,6 +101,9 @@ String.prototype.allReplace = function (obj) {
 
 export default {
     name: 'chatsessions',
+    components: {
+    Card
+    },
     data() {
         return {
             collapse1: {
@@ -175,73 +153,17 @@ export default {
                     horizontalAlign: 'center',
                 },
                 labels: [],
+                noData: {
+                    text: 'Keine Daten verfügbar',
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    style: {
+                        fontSize: '20px',
+                    }
+                }
             },
             durationStats: [],
             durationSeries: [],
-            chartOptions: {
-                chart: {
-                    type: 'area',
-                    zoom: {
-                        enabled: true
-                    },
-                    locales: [de],
-                    defaultLocale: "de",
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'straight'
-                },
-                title: {
-                    text: 'ChatSession Dauer (In Minuten)',
-                    align: 'left'
-                },
-                grid: {
-                    row: {
-                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                        opacity: 0.5
-                    },
-                },
-                xaxis: {
-                    type: 'datetime',
-                    labels: {
-                        datetimeFormatter: {
-                            year: 'yyyy',
-                            month: 'MMM \'yy',
-                            day: 'dddd, dd.MMM.',
-                            hour: 'HH:mm'
-                        },
-                    }
-                },
-                yaxis: {
-                    tickAmount: 20
-                },
-                theme: {
-                    palette: 'palette6'
-                },
-                markers: {
-                    size: 4,
-                    colors: '#f3f3f3',
-                    strokeColors: '#2e2e2e',
-                },
-                labels: {
-                    show: true,
-                    formatter: (val) => {
-                        return new Date(val);
-                    }
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.7,
-                        opacityTo: 0.9,
-                        stops: [50, 100]
-                    }
-                },
-
-            },
             usedFunctions: [],
             tableHeaders: [{
                     key: "_id",
@@ -310,7 +232,11 @@ export default {
                 }
             }).then(res => {
                 this.avgStats = res.data
-                this.gaSeries = [res.data[1], res.data[3]]
+                if(res.data[1] !== 0 && res.data[3] !== 0){
+                    this.gaSeries = [res.data[1], res.data[3]]
+                } else {
+                    this.gaSeries = []
+                }
                 this.gaChartOptions = {
                     labels: ['Gäste', 'Berater']
                 }
@@ -354,7 +280,6 @@ export default {
                 this.maxStats = this.ratingStats[1]
                 let arr = []
                 for (var elem of res.data[0]) {
-                    console.log(elem)
                     arr.push(elem.count)
                     if (elem) {
                         this.ratingOptions.labels.push(elem.title)
@@ -373,9 +298,15 @@ export default {
             this.getUsedFunctions()
             this.ratingsAggregate()
         },
+        resize() {
+            window.dispatchEvent(new Event('resize'))
+        },
     },
     created() {
         this.refresh()
+    },
+    mounted(){
+        this.resize()
     },
     computed: {
         rows() {
@@ -475,4 +406,9 @@ button.page-link {
     font-size: 50px;
     font-weight: bold;
 }
+
+.topP{
+    margin-top: 40px;
+}
+
 </style>

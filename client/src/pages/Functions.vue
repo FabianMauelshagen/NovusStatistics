@@ -3,32 +3,8 @@
         <p class="topHeader">Funktions Statistik</p>
         <time-component v-on:date-changed="date = $event; refresh()"></time-component>
         <div>
-
-            <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block @click="collapse1.show = !collapse1.show" variant="dark">Nutzungs Häufigkeit
-                    </b-button>
-                </b-card-header>
-                <b-collapse v-model="collapse1.show" id="collapse-1" class="mt-2">
-                    <b-card-body>
-                        <b-row>
-                            <b-col>
-                                <div id="chart">
-                                    <apexchart type="bar" height="350" :options="chartOptions" :series="series">
-                                    </apexchart>
-                                </div>
-                            </b-col>
-                            <b-col>
-                                <div id="chart">
-                                    <apexchart type="bar" height="350" ref="stackedChart" :options="stackedChartOptions"
-                                        :series="stackedSeries"></apexchart>
-                                </div>
-                            </b-col>
-                        </b-row>
-                    </b-card-body>
-                </b-collapse>
-            </b-card>
-
+            <Card chart-type="doubleBar" :arr-series="[series, stackedSeries]" :arr-labels="[labArr, labArr]" :new-stack-bool="[false, true]" card-text="Nutzungs Häufigkeit"/>
+ 
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
                     <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Nutzungs Dauer
@@ -73,65 +49,25 @@ const getBusyTimesLoopURL = 'http://localhost:3000/functions/getBusyTimesLoop'
 const calcEachDayURL = 'http://localhost:3000/functions/calcEachDay'
 const calcTotalURL = 'http://localhost:3000/functions/calcTotal'
 import de from "apexcharts/dist/locales/de.json"
+import Card from '../components/Card'
 
 const time = require('../assets/time')
 var labArr = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
 export default {
     name: 'chatsessions',
+    components: {
+        Card
+    },
     data() {
         return {
-            collapse1: {
-                show: false
-            },
+            labArr: labArr,
             collapse2: {
                 show: false
             },
             series: [],
             stackedSeries: [],
             singleSeries: [],
-            stackedChartOptions: {
-                chart: {
-                    stacked: true,
-                },
-                title: {
-                    text: 'Stündliche Nutzung kumuliert Einzeln',
-                },
-                theme: {
-                    mode: 'light',
-                    palette: 'palette3'
-                },
-                xaxis: {
-                    labels: {
-                        formatter: function (value) {
-                            return value + ':00'
-                        }
-                    },
-                    categories: labArr
-                }
-            },
-            chartOptions: {
-                title: {
-                    text: 'Stündliche Nutzung kumuliert Gesamt'
-                },
-                grid: {
-                    row: {
-                        colors: ['#fff', '#f2f2f2']
-                    }
-                },
-                xaxis: {
-                    labels: {
-                        formatter: function (value) {
-                            return value + ':00'
-                        }
-                    },
-                    categories: labArr
-                },
-                theme: {
-                    mode: 'light',
-                    palette: 'palette3'
-                },
-            },
             error: [],
             date: {
                 startDate: time.getSpecificDate('2020-11-01')[0],

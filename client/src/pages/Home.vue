@@ -12,9 +12,6 @@
                     <router-link class="rectangle" to="/functions"></router-link>
                 </b-col>
                 <b-col>
-                    <router-link class="rectangle" to="/time"></router-link>
-                </b-col>
-                <b-col>
                     <router-link class="rectangle" to="/users"></router-link>
                 </b-col>
             </b-row>

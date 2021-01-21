@@ -1,27 +1,19 @@
 <template>
   <div id="app">
     <div id="nav">
-      <b-navbar type="dark" fixed="top" variant="dark">
-        <img id="logo" src="./assets/logo.png">
-        <b-navbar-nav id="nav_body">
-          <router-link tag="b-nav-item" to="/">Home</router-link>
-          <router-link tag="b-nav-item" to="/guests">Guests</router-link>
-          <router-link tag="b-nav-item" to="/chatsession">Chatsession</router-link>
-          <router-link tag="b-nav-item" to="/functions">Functions</router-link>
-          <router-link tag="b-nav-item" to="/time">Time</router-link>
-          <router-link tag="b-nav-item" to="/users">Users</router-link>
-        </b-navbar-nav>
-      </b-navbar>
+      <Navbar/>
     </div>
     <router-view/>
   </div>
 </template>
 
 <script>
+import Navbar from './components/Navbar'
 
 export default {
   name: 'App',
   components: {
+    Navbar
   }
 }
 </script>
@@ -35,7 +27,7 @@ export default {
 }
 
 #nav {
-  margin-bottom: 130px;
+  margin-bottom: 50px;
 }
 
 #logo {
