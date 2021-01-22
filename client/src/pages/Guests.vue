@@ -115,12 +115,20 @@ export default {
         }
       }).then(res => {
         this.statsValues = res.data[1]
+        let zero = true
+        let dataArray = []
         for (var elem of res.data[0]) {
-          this.dataSeries.push(elem)
+          dataArray.push(elem)
+          if(elem[1] != 0){
+              zero = false
+          } 
+        }
+        if(zero){
+          dataArray.length = 0
         }
         this.statsSeries = [{
           name: "Kunden",
-          data: this.dataSeries
+          data: dataArray
         }]
 
       }).catch(e => {

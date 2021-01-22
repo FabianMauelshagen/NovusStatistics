@@ -99,23 +99,20 @@ async function getBusyTimesLoop(startDate, endDate) {
     let from = 7
     let to = 16
     let i = 0
-    try {
-      const res = await getBusyTimesForEach(startDate, endDate, from, to, loopElem.action, loopElem.type)
-      for (from; from <= to; from++) {
-        loopElem.valArr[i] = 0
+    let zero = true
+    const res = await getBusyTimesForEach(startDate, endDate, from, to, loopElem.action, loopElem.type)
+    for (from; from <= to; from++) {
+      loopElem.valArr[i] = 0
 
-        for (val of res) {
-          if (from == val._id) {
-            loopElem.valArr[i] = val.count
-          }
+      for (val of res) {
+        if (from == val._id) {
+          loopElem.valArr[i] = val.count
+          zero = false
         }
-        i++
       }
-    } catch (e) {
-      console.log(e)
+      i++
     }
-
-
+    if (zero) loopElem.valArr.length = 0
   }
   return types
 }
@@ -415,7 +412,6 @@ async function calcDuration(startDate, endDate, z) {
   stats[4] = date
   stats[5] = type
 
-  //return [durations, stats]
   return stats
 
 }

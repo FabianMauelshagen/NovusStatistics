@@ -23,10 +23,10 @@
 import de from "apexcharts/dist/locales/de.json"
 
 export default {
-    props: ["dataSeries", "dataLabels"],
-    data() {
-        return {
-        chartOptions: {
+  props: ["dataSeries", "dataLabels"],
+  data() {
+    return {
+      chartOptions: {
         chart: {
           type: 'area',
 
@@ -77,9 +77,17 @@ export default {
             stops: [50, 100]
           }
         },
+        noData: {
+          text: 'Keine Daten verfügbar',
+          align: 'center',
+          verticalAlign: 'middle',
+          style: {
+            fontSize: '20px',
+          }
+        }
 
       },
-        }
     }
+  }
 }
 </script>

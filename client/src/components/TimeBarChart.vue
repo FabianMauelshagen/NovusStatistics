@@ -35,6 +35,14 @@ export default {
                     mode: 'light',
                     palette: 'palette3'
                 },
+                noData: {
+                    text: 'Keine Daten verfügbar',
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    style: {
+                        fontSize: '20px',
+                    }
+                }
             },
         }
     }

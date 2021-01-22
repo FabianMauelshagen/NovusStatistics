@@ -135,6 +135,14 @@ export default {
                     horizontalAlign: 'center',
                 },
                 labels: [],
+                noData: {
+                    text: 'Keine Daten verfügbar',
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    style: {
+                        fontSize: '20px',
+                    }
+                }
             },
             ratings: [],
             currentPage: 1,

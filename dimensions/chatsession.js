@@ -216,9 +216,9 @@ function ratingsAggregate(startDate, endDate) {
         }
         // Auslesen der den Max und Min Werten entsprechenden Themen
         for (elem of array) {
-          if (elem.count == minWert) {
+          if (elem.count == minWert && elem.count > 0) {
             minThema[minThema.length] = elem.title
-          } else if (elem.count == maxWert) {
+          } else if (elem.count == maxWert && elem.count > 0) {
             maxThema[maxThema.length] = elem.title
           }
         }
@@ -348,25 +348,6 @@ function getUsedFunctionsInOrder(startDate, endDate) {
     })
   })
 }
-
-/* function getTotal(Model){
-  return new Promise(function(resolve, reject){
-    let total = 0
-    Model.aggregate([
-      {
-        $group: {
-          _id: null, 
-          count: {
-            $sum: 1
-          }
-        }
-      }
-    ], function(err, result){
-      total = result[0].count
-      resolve(total)
-    })
-  })
-} */
 
 // Anzahl an Chatsessions Gesamt
 function getTotalByDate(startDate, endDate) {

@@ -99,6 +99,14 @@ export default {
                 legend: {
                     position: 'right',
                     horizontalAlign: 'right'
+                },
+                noData: {
+                    text: 'Keine Daten verfügbar',
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    style: {
+                        fontSize: '20px',
+                    }
                 }
             },
             functionSeries: [
@@ -129,15 +137,17 @@ export default {
             }).then(res => {
                 let valArr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 let i = 0
+                let zero = true
                 for (var elem of labArr) {
                     for (var el of res.data) {
                         if (elem == el._id) {
                             valArr[i] = el.count
+                            zero = false
                         }
                     }
                     i++
                 }
-
+                if(zero) valArr.length = 0
                 this.series = [{
                     name: 'Nutzungen',
                     data: valArr
@@ -173,10 +183,22 @@ export default {
                 }
             }).then(val => {
                 for (var elem of val.data) {
-                    array.push({
-                        name: elem.name,
-                        data: elem.data
-                    })
+                    let zero = true
+                    for(var data of elem.data){
+                        if(data[1] != 0) zero = false
+                    }
+                    if(!zero){
+                        array.push({
+                            name: elem.name,
+                            data: elem.data
+                        })
+                    } else {
+                        array.push({
+                            name: '',
+                            data: []
+                        })
+                    }
+                    
                 }
             }).catch(e => {
                 this.error.push(e)
