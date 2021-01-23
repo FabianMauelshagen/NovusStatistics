@@ -7,8 +7,7 @@
  
             <b-card no-body class="mb-1">
                 <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Nutzungs Dauer
-                    </b-button>
+                    <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Nutzungs Dauer</b-button>
                 </b-card-header>
                 <b-collapse v-model="collapse2.show" id="collapse-2" class="mt-2">
                     <b-card-body id="chart" v-for="(elem, i) in functionStats" v-bind:key="i" v-bind:index="i">
@@ -351,6 +350,10 @@ button.page-link {
     font-weight: 500;
 }
 
+button {
+    font-weight: bold!important;
+}
+
 .offset {
     width: 500px !important;
     margin: 20px auto;
@@ -366,7 +369,8 @@ button.page-link {
 .topHeader {
     text-align: center;
     color: #343a40;
-    font-size: 50px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 65px;
     font-weight: bold;
 }
 

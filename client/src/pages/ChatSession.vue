@@ -396,6 +396,10 @@ button.page-link {
     font-weight: 500;
 }
 
+button {
+    font-weight: bold;
+}
+
 .offset {
     width: 500px !important;
     margin: 20px auto;
@@ -411,7 +415,8 @@ button.page-link {
 .topHeader {
     text-align: center;
     color: #343a40;
-    font-size: 50px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 65px;
     font-weight: bold;
 }
 

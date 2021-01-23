@@ -135,9 +135,22 @@ export default {
     background-color: #343a40;
     margin: 2px;
     margin-bottom: 5px;
+    font-weight: bold;
+    border: none;
+}
+
+.tbtn:hover {
+    background-color: #7EF6B6;
+    color: #595959;
+}
+
+.tbtn:disabled {
+    background-color: #7EF6B6;
+    color: black;
 }
 
 .pickBtn {
     margin-bottom: 5px;
 }
+
 </style>

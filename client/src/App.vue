@@ -26,7 +26,7 @@ export default {
   text-align: center;
 }
 
-#nav {
+#nav{
   margin-bottom: 50px;
 }
 
@@ -41,5 +41,20 @@ export default {
 
 body {
     overflow-y: scroll;
+    background-image: url('./assets/main.png');
+    background-size: cover;
+}
+
+.navbar-dark .navbar-nav .nav-link{
+  color: white !important;
+  font-weight: bold;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover{
+  color: #7EF6B6 !important;
+}
+
+.form-control {
+  font-weight: bold !important
 }
 </style>

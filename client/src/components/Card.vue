@@ -77,5 +77,9 @@ export default {
     background-color:  #343a40;
     box-shadow: none;
   }
-</style>
+  
+button {
+    font-weight: bold;
+}
+  </style>
 
