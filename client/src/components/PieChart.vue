@@ -1,18 +1,37 @@
 <template>
     <div class="chart" id="chart" align="center">
-        <apexchart type="pie" width="450" :options="chartOptions" :series="dataSeries">
+        <apexchart type="pie" :width="pieSize" :options="chartOptions" :series="dataSeries">
     </apexchart>
     </div>
 </template>
 
 <script>
 export default {
-    props: ["dataSeries", "dataLabels", "dataName"],
+    props: ["dataSeries", "dataLabels", "dataName", "pieSize"],
     data() {
         return {
             chartOptions: {
                 chart: {
-                type: 'pie'
+                type: 'pie',
+                width: 450,
+                toolbar: {
+                    show: true,
+                    offsetX: -50,
+                    tools: {
+                    download: true,
+                    },
+                    export: {
+                        csv: {
+                            filename: undefined,
+                            columnDelimiter: ',',
+                            headerCategory: 'category',
+                            headerValue: 'value',
+                            dateFormatter(timestamp) {
+                                return new Date(timestamp).toDateString()
+                            }
+                        }
+                    },
+                },
                 },
                 title: {
                 text: this.dataName,
@@ -34,7 +53,7 @@ export default {
                     style: {
                         fontSize: '20px',
                     }
-                }
+                },
             },
         }
     },

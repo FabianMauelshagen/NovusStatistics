@@ -7,16 +7,16 @@
 
 <script>
 export default {
-    props: ["dataSeries", "dataLabels", "stackBool"],
+    props: ["dataSeries", "dataLabels", "stackBool", "dataTitle"],
     data() {
         return {
             series: this.dataSeries,
             chartOptions: {
                 chart: {
-                    stacked: this.stackBool,
+                    stacked: this.stackBool
                 },
                 title: {
-                    text: 'Stündliche Nutzung kumuliert Gesamt'
+                    text: this.dataTitle
                 },
                 grid: {
                     row: {

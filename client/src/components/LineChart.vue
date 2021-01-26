@@ -23,7 +23,7 @@
 import de from "apexcharts/dist/locales/de.json"
 
 export default {
-  props: ["dataSeries", "dataLabels"],
+  props: ["dataSeries", "dataLabels", "dataTitle"],
   data() {
     return {
       chartOptions: {
@@ -36,7 +36,6 @@ export default {
           locales: [de],
           defaultLocale: "de",
         },
-
         dataLabels: {
           enabled: false
         },
@@ -44,8 +43,11 @@ export default {
           curve: 'straight'
         },
         title: {
-          text: 'Kundenaufkommen',
+          text: this.dataTitle[0],
           align: 'left'
+        },
+        subtitle: {
+            text: this.dataTitle[1],
         },
         grid: {
           row: {

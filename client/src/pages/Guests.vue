@@ -1,12 +1,12 @@
 <template>
-  <div class="full-width">
-    <p class="topHeader">Kunden Statistik</p>
+  <div>
+    <Header header="Kunden Statistik" />
     <time-component v-on:date-changed="date = $event; refresh()"></time-component>
-    <Card :n=type.length chart-type="pie" :new-series="pieSeries" :new-labels="pieLabels" card-text="Systemdiagnose" :new-names="statsNames" />
-    <Card chart-type="line" :new-series="statsSeries" :new-labels="statsValues" card-text="Kundenaufkommen"/>
-    <Card :n=1 chart-type="pie" :new-series="[inviteSeries]" :new-labels="[inviteLabels]" card-text="Screen-Sharing Annahme" :new-names="['Screen-Sharing']"/>
+    <Card :n=type.length chart-type="pie" :new-series="pieSeries" :new-labels="pieLabels" card-text="Systemdiagnose" :new-names="statsNames" :new-pie-size="450"/>
+    <Card chart-type="line" :new-series="statsSeries" :new-labels="statsValues" card-text="Kundenaufkommen" :new-title="['Kunden Anzahl kumuliert', 'pro Tag']" />
+    <Card :n=1 chart-type="pie" :new-series="[inviteSeries]" :new-labels="[inviteLabels]" card-text="Screen-Sharing Annahme" :new-names="['Screen-Sharing']" 
+    :new-pie-size="550"/>
   </div>
-
 </template>
 
 <script>
@@ -16,23 +16,16 @@ const getStatsURL = 'http://localhost:3000/guests/getStats'
 const inviteStatsURL = 'http://localhost:3000/guests/getInviteStats'
 const time = require('../assets/time')
 import Card from '../components/Card'
+import Header from '../components/Header'
 
 export default {
   name: 'guests',
   components: {
-    Card
+    Card,
+    Header
   },
   data() {
     return {
-      collapse1: {
-        show: false
-      },
-      collapse2: {
-        show: false
-      },
-      collapse3: {
-        show: false
-      },
       pieSeries: [
         [],
         [],
@@ -183,95 +176,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #ffffff;
-}
-
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-td,
-th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
-
-.p-1 {
-  background-color: #444444;
-}
-
-.full-width {
-  padding-right: 50px;
-  padding-left: 50px;
-}
-
-.btn.btn-info.btn-block.collapsed,
-.btn.btn-info.btn-block.not-collapsed {
-  background-color: #343a40;
-  color: #ffffff;
-  border: none;
-  box-shadow: none;
-}
-
-.btn:focus {
-  box-shadow: none
-}
-
-span {
-  margin-left: 20px;
-}
-
-button.page-link {
-  display: inline-block;
-}
-
-button.page-link {
-  font-size: 20px;
-  color: #29b3ed;
-  font-weight: 500;
-}
-
-.offset {
-  width: 500px !important;
-  margin: 20px auto;
-}
-
-.list-group {
-  max-height: 600px;
-  margin-bottom: 20px;
-  overflow: auto;
-  border: 1px solid #ddd;
-}
-
-.topHeader {
-  text-align: center;
-  color: #343a40;
-  font-size: 50px;
-  font-weight: bold;
-}
-
-</style>

@@ -139,8 +139,8 @@ export default {
     border: none;
 }
 
-.tbtn:hover {
-    background-color: #7EF6B6;
+.tbtn:active, .tbtn:hover{
+    background-color: #7EF6B6!important;
     color: #595959;
 }
 

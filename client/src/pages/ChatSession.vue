@@ -1,25 +1,26 @@
 <template>
-    <div class="full-width">
-        <p class="topHeader">Sitzungs Statistik</p>
+    <div>
+        <Header header="Sitzungs Statistik" />
         <time-component v-on:date-changed="date = $event; refresh()"></time-component>
         <b-card no-body class="mb-1">
-            <b-card-header header-tag="header" class="p-1" role="tab">
                 <b-button block @click="collapse1.show = !collapse1.show; resize()" variant="dark">Allgemein</b-button>
-            </b-card-header>
             <b-collapse v-model="collapse1.show" id="collapse-1" class="mt-2">
                 <b-card-body>
                     <b-row>
                         <b-col>
-                            <b-table striped hover :items="usedFunctions" :fields="tableHeaders" :per-page="perPage"
+                            
+                            <b-table id="functionTable" striped hover :items="usedFunctions" :fields="tableHeaders" :per-page="perPage"
                                 :current-page="currentPage"></b-table>
-                            <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" pills>
-                            </b-pagination>
+                                <b-row>
+                                <b-pagination class="ml-3" v-model="currentPage" :total-rows="rows" :per-page="perPage">
+                                </b-pagination>
+                                <b-button class="tbtn"  @click="csvExport(usedFunctions)"><b-icon icon="download"></b-icon> CSV</b-button>
+                            </b-row>
+                            
                         </b-col>
                         <b-col>
-                            <div id="chart" align="center">
-                                <apexchart type="pie" width="450" :options="gaChartOptions" :series="gaSeries">
-                                </apexchart>
-                            </div>
+                            <PieChart :data-series="gaSeries" :data-labels="gaLabels" data-name="Anzahl Gäste und Berater" pie-size="450"/>
+                            
                             <p class="topP" :v-model="avgStats[0]"><b>Sitzungen:</b> {{avgStats[0]}} </p>
 
                             <p :v-model="avgStats[1]"><b>Gäste Gesamt:</b> {{avgStats[1]}} <span
@@ -36,32 +37,10 @@
         </b-card>
 
         <b-card no-body class="mb-1">
-            <b-card-header header-tag="header" class="p-1" role="tab">
                 <b-button block @click="collapse2.show = !collapse2.show; resize()" variant="dark">Behandelte Themen</b-button>
-            </b-card-header>
             <b-collapse v-model="collapse2.show" id="collapse-2" class="mt-2">
                 <b-card-body>
                     <b-row>
-                        <b-col>
-                            <b-list-group>
-                                <b-list-group-item><b>Seltenste Themen</b></b-list-group-item>
-                                <b-list-group-item v-for="(elem, index) in minStats[0]" v-bind:index="index"
-                                    v-bind:key="index">{{elem}}</b-list-group-item>
-                                <b-list-group-item><b>Anzahl: {{minStats[1]}}</b></b-list-group-item>
-                            </b-list-group>
-                            <b-list-group>
-                                <b-list-group-item><b>Häufigste Themen</b></b-list-group-item>
-                                <b-list-group-item v-for="(elem, index) in maxStats[0]" v-bind:index="index"
-                                    v-bind:key="index">{{elem}}</b-list-group-item>
-                                <b-list-group-item><b>Anzahl: {{maxStats[1]}}</b></b-list-group-item>
-                            </b-list-group>
-                        </b-col>
-                        <b-col>
-                            <div id="chart" align="center">
-                                <apexchart type="pie" width="700" :options="ratingOptions" :series="ratings">
-                                </apexchart>
-                            </div>
-                        </b-col>
                         <b-col>
                             <b-list-group>
                                 <b-list-group-item><b>Nicht genutz</b></b-list-group-item>
@@ -69,13 +48,31 @@
                                     v-bind:key="index">{{elem}}</b-list-group-item>
                             </b-list-group>
                         </b-col>
+                        <b-col>
+                            <b-list-group class="mb-4">
+                                <b-list-group-item><b>Seltenste Themen</b></b-list-group-item>
+                                <b-list-group-item v-for="(elem, index) in minStats[0]" v-bind:index="index"
+                                    v-bind:key="index">{{elem}}</b-list-group-item>
+                                <b-list-group-item><b>Anzahl: {{minStats[1]}}</b></b-list-group-item>
+                            </b-list-group>
+                            
+                            <b-list-group>
+                                <b-list-group-item><b>Häufigste Themen</b></b-list-group-item>
+                                <b-list-group-item v-for="(elem, index) in maxStats[0]" v-bind:index="index"
+                                    v-bind:key="index">{{elem}}</b-list-group-item>
+                                <b-list-group-item><b>Anzahl: {{maxStats[1]}}</b></b-list-group-item>
+                            </b-list-group>
+                            <b-button class="csv2"  @click="csvExport(ratingStats)"><b-icon icon="download"></b-icon> CSV</b-button>
+                        </b-col>
+                        <b-col>
+                            <PieChart :data-series="ratings" :data-labels="ratingLabels" data-name="Themen Nutzung" pie-size="600"/>
+                        </b-col>
                     </b-row>
-
                 </b-card-body>
             </b-collapse>
         </b-card>
         
-        <Card chart-type="line" :new-series="series" :new-labels="durationStats" card-text="Sitzungs Dauer"/>
+        <Card chart-type="line" :new-series="series" :new-labels="durationStats" card-text="Sitzungs Dauer" :new-title="['Sitzungs Dauer', 'in Minuten']"/>
 
     </div>
 </template>
@@ -88,7 +85,8 @@ const getUsedFunctionsURL = 'http://localhost:3000/chatsessions/getUsedFunctions
 const ratingsAggregateURL = 'http://localhost:3000/chatsessions/ratingsAggregate'
 import Card from '../components/Card'
 const time = require('../assets/time')
-
+import PieChart from '../components/PieChart'
+import Header from '../components/Header'
 
 
 String.prototype.allReplace = function (obj) {
@@ -102,7 +100,9 @@ String.prototype.allReplace = function (obj) {
 export default {
     name: 'chatsessions',
     components: {
-    Card
+    Card,
+    PieChart,
+    Header
     },
     data() {
         return {
@@ -112,64 +112,17 @@ export default {
             collapse2: {
                 show: false
             },
-            collapse3: {
-                show: false
-            },
             series: [],
             gaSeries: [],
+            gaLabels: ['Gäste', 'Berater'],
             avgStats: [],
             minStats: [],
             maxStats: [],
             ratingStats: [],
-            ratingOptions: {
-                title: {
-                    text: "Themen Nutzung",
-                    align: 'center'
-                },
-                theme: {
-                    mode: 'light',
-                    palette: 'palette3'
-                },
-                legend: {
-                    position: 'bottom',
-                    horizontalAlign: 'center',
-                },
-                labels: [],
-                noData: {
-                    text: 'Keine Daten verfügbar',
-                    align: 'center',
-                    verticalAlign: 'middle',
-                    style: {
-                        fontSize: '20px',
-                    }
-                }
-            },
+            ratingLabels: [],
             ratings: [],
             currentPage: 1,
             perPage: 9,
-            gaChartOptions: {
-                title: {
-                    text: "Anzahl Gäste und Berater",
-                    align: 'center'
-                },
-                theme: {
-                    mode: 'light',
-                    palette: 'palette3'
-                },
-                legend: {
-                    position: 'bottom',
-                    horizontalAlign: 'center',
-                },
-                labels: [],
-                noData: {
-                    text: 'Keine Daten verfügbar',
-                    align: 'center',
-                    verticalAlign: 'middle',
-                    style: {
-                        fontSize: '20px',
-                    }
-                }
-            },
             durationStats: [],
             durationSeries: [],
             usedFunctions: [],
@@ -245,9 +198,6 @@ export default {
                 } else {
                     this.gaSeries = []
                 }
-                this.gaChartOptions = {
-                    labels: ['Gäste', 'Berater']
-                }
             }).catch(e => {
                 this.error.push(e)
             })
@@ -290,7 +240,7 @@ export default {
                 for (var elem of res.data[0]) {
                     arr.push(elem.count)
                     if (elem) {
-                        this.ratingOptions.labels.push(elem.title)
+                        this.ratingLabels.push(elem.title)
                     }
                 }
                 this.ratings = arr
@@ -299,8 +249,24 @@ export default {
             })
         },
 
+        csvExport(arrData) {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += [
+                Object.keys(arrData[0]).join(";"),
+                ...arrData.map(item => Object.values(item).join(";"))
+            ]
+                .join("\n")
+                .replace(/(^\[)|(\]$)/gm, "");
+
+            const data = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", data);
+            link.setAttribute("download", "export.csv");
+            link.click();
+        },
+
         async refresh() {
-            this.ratingOptions.labels.length = 0
+            this.ratingLabels.length = 0
             this.getDurations()
             this.getAvgStats()
             this.getUsedFunctions()
@@ -326,102 +292,34 @@ export default {
 </script>
 
 <style scoped>
-h3 {
-    margin: 40px 0 0;
-}
 
-ul {
-    list-style-type: none;
-    padding: 0;
-}
+    #functionTable{
+        
+    }
 
-li {
-    display: inline-block;
-    margin: 0 10px;
-}
+    .tbtn {
+        position: absolute;
+        right: 0px;
+        width: 15%;
+        margin-right: 2%;
+    }
 
-a {
-    color: #ffffff;
-}
+    .csv2 {
+        background-color: #343a40 !important;
+        margin-top: 25px;
+        font-weight: bold;
+        border: none !important;
+    }
 
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-}
+    .csv2:active {
+        background-color: #3c4249 !important;
+        color: #7EF6B6 !important;
+    }
 
-td,
-th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-}
-
-tr:nth-child(even) {
-    background-color: #dddddd;
-}
-
-.p-1 {
-    background-color: #343a40;
-}
-
-.full-width {
-    padding-right: 50px;
-    padding-left: 50px;
-}
-
-.btn.btn-info.btn-block.collapsed,
-.btn.btn-info.btn-block.not-collapsed {
-    background-color: #343a40;
-    color: #ffffff;
-    border: none;
-    box-shadow: none;
-}
-
-.btn:focus {
-    box-shadow: none
-}
-
-span {
-    margin-left: 20px;
-}
-
-button.page-link {
-    display: inline-block;
-}
-
-button.page-link {
-    font-size: 20px;
-    color: #29b3ed;
-    font-weight: 500;
-}
-
-button {
-    font-weight: bold;
-}
-
-.offset {
-    width: 500px !important;
-    margin: 20px auto;
-}
-
-.list-group {
-    max-height: 600px;
-    margin-bottom: 20px;
-    overflow: auto;
-    border: 1px solid #ddd;
-}
-
-.topHeader {
-    text-align: center;
-    color: #343a40;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 65px;
-    font-weight: bold;
-}
-
-.topP{
-    margin-top: 40px;
-}
-
+    .csv2:disabled,
+    .csv2:hover {
+        background-color: #7EF6B6 !important;
+        color: #343a40 !important;
+        border: none;
+    }
 </style>

@@ -16,17 +16,26 @@
             <router-link tag="b-nav-item" to="/users">Berater</router-link>
             <router-link tag="b-nav-item" to="/guests">Kunden</router-link>
         </b-navbar-nav>
+        <b-navbar-nav class="ml-auto">
+            <b-nav-item>{{ now }}</b-nav-item>
+        </b-navbar-nav>
     </b-navbar>    
-    
-    <p class="timeString" :v-model="heute">{{heute.toLocaleDateString('de-DE')}}</p>
     </div>
 </template>
 
 <script>
+const options = { year: 'numeric', month: '2-digit', day: 'numeric' }
+
 export default {
     data(){
         return {
             heute: new Date()
+        }
+    },
+        computed: {
+        now: function() {
+            const today = new Date()
+            return today.toLocaleDateString('de-DE', options)
         }
     }
 }
@@ -36,16 +45,6 @@ export default {
 #headerLink:hover{
     color: blue;
     text-decoration: none;
-}
-
-.timeString {
-    text-align: right;
-    margin-top: 100px;
-    margin-right: 70px;
-    color: #343a40;
-    font-size: 18px;
-    font-weight: bold;
-    display:block
 }
 
 .header {

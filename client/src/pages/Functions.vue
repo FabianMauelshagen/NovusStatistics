@@ -1,14 +1,14 @@
 <template>
-    <div class="full-width">
-        <p class="topHeader">Funktions Statistik</p>
+    <div>
+        <Header header="Funktions Statistik" />
         <time-component v-on:date-changed="date = $event; refresh()"></time-component>
         <div>
-            <Card chart-type="doubleBar" :arr-series="[series, stackedSeries]" :arr-labels="[labArr, labArr]" :new-stack-bool="[false, true]" card-text="Nutzungs Häufigkeit"/>
+            <Card chart-type="doubleBar" :arr-series="[series, stackedSeries]" :arr-labels="[labArr, labArr]" :new-stack-bool="[false, true]" card-text="Nutzungs Häufigkeit"
+            :new-title="['Stündliche Nutzung kumuliert - Gesamt', 'Stündliche Nutzung kumuliert - Einzeln']"
+            />
  
             <b-card no-body class="mb-1">
-                <b-card-header header-tag="header" class="p-1" role="tab">
-                    <b-button block @click="collapse2.show = !collapse2.show" variant="dark">Nutzungs Dauer</b-button>
-                </b-card-header>
+                    <b-button block @click="collapse2.show = !collapse2.show; resize()" variant="dark">Nutzungs Dauer</b-button>
                 <b-collapse v-model="collapse2.show" id="collapse-2" class="mt-2">
                     <b-card-body id="chart" v-for="(elem, i) in functionStats" v-bind:key="i" v-bind:index="i">
                         <div>
@@ -49,6 +49,7 @@ const calcEachDayURL = 'http://localhost:3000/functions/calcEachDay'
 const calcTotalURL = 'http://localhost:3000/functions/calcTotal'
 import de from "apexcharts/dist/locales/de.json"
 import Card from '../components/Card'
+import Header from '../components/Header'
 
 const time = require('../assets/time')
 var labArr = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
@@ -56,7 +57,8 @@ var labArr = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 export default {
     name: 'chatsessions',
     components: {
-        Card
+        Card,
+        Header
     },
     data() {
         return {
@@ -278,100 +280,3 @@ export default {
 
 }
 </script>
-
-<style>
-h3 {
-    margin: 40px 0 0;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    display: inline-block;
-    margin: 0 10px;
-}
-
-a {
-    color: #ffffff;
-}
-
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-}
-
-td,
-th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-}
-
-tr:nth-child(even) {
-    background-color: #dddddd;
-}
-
-.p-1 {
-    background-color: #343a40;
-}
-
-.full-width {
-    padding-right: 50px;
-    padding-left: 50px;
-}
-
-.btn.btn-info.btn-block.collapsed,
-.btn.btn-info.btn-block.not-collapsed {
-    background-color: #343a40;
-    color: #ffffff;
-    border: none;
-    box-shadow: none;
-}
-
-.btn:focus {
-    box-shadow: none
-}
-
-span {
-    margin-left: 20px;
-}
-
-button.page-link {
-    display: inline-block;
-}
-
-button.page-link {
-    font-size: 20px;
-    color: #29b3ed;
-    font-weight: 500;
-}
-
-button {
-    font-weight: bold!important;
-}
-
-.offset {
-    width: 500px !important;
-    margin: 20px auto;
-}
-
-.list-group {
-    max-height: 600px;
-    margin-bottom: 20px;
-    overflow: auto;
-    border: 1px solid #ddd;
-}
-
-.topHeader {
-    text-align: center;
-    color: #343a40;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 65px;
-    font-weight: bold;
-}
-
-</style>

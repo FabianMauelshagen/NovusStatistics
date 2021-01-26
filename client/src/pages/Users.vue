@@ -1,6 +1,6 @@
 <template>
-  <div class="full-width">
-      <p class="topHeader">Berater Statistik</p>
+  <div>
+    <Header header="Berater Statistik"/> 
     <time-component v-on:date-changed="date = $event; refresh()"></time-component>
     <Card chart-type="bar" :new-series="sessionInterruptsSeries" :new-labels="sessionInterruptsLabels" card-text="Sitzungs-Unterbrechungen"/>
     <Card chart-type="bar" :new-series="frequencyOfAcceptanceSeries" :new-labels="frequencyOfAcceptanceLabels" card-text="Annahme-Rate"/>
@@ -14,13 +14,14 @@ const axios = require('axios')
 const sessionInterruptsURL = 'http://localhost:3000/users/getSessionInterrupts'
 const frequencyOfAcceptanceURL = 'http://localhost:3000/users/getFrequencyOfAcceptance'
 const usedFunctionsURL = 'http://localhost:3000/users/getUsedFunctions'
-
+import Header from '../components/Header'
 const time = require('../assets/time')
 
 export default {
   name: 'users',
   components: {
-    Card
+    Card,
+    Header
   },
   data() {
     return {
