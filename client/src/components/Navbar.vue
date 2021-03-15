@@ -24,7 +24,7 @@
 </template>
 
 <script>
-const options = { year: 'numeric', month: '2-digit', day: 'numeric' }
+const options = { year: 'numeric', month: '2-digit', day: '2-digit' }
 
 export default {
     data(){

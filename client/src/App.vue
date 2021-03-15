@@ -201,4 +201,39 @@ button {
 .table-striped > tbody > tr:nth-child(2n) > td, .table-striped > tbody > tr:nth-child(2n) > th {
    background-color: #eeeeee;
 }
+
+.b-calendar-header {
+  display: none
+}
+
+.b-calendar-grid-help.border-top.small.text-muted.text-center.bg-light {
+  display: none
+}
+
+.btn.border-0.rounded-circle.text-nowrap.active.btn-primary.font-weight-bold {
+  background-color: #343a40 !important;
+  color: #7EF6B6
+}
+
+.btn.border-0.rounded-circle.text-nowrap.focus.active.btn-primary.font-weight-bold {
+  box-shadow: none !important;
+}
+
+.btn.border-0.rounded-circle.text-nowrap.btn-outline-light.text-dark.font-weight-bold:hover {
+  background-color:#f1f1f1 !important;
+}
+
+.btn-outline-primary {
+  color: #7EF6B6 !important
+}
+
+.btn-outline-primary:hover {
+  background-color: #343a40 !important
+}
+
+.form-control {
+  box-shadow: none !important;
+  border-color: #d4d4d4 !important;
+}
+
 </style>

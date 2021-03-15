@@ -65,4 +65,10 @@ export default {
     margin-left: -20px;
     margin-right: -20px;
 }
+
+.chart{
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
 </style>

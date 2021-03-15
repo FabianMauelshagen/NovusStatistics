@@ -58,7 +58,7 @@ export default {
   data() {
     return {
       isLoading: [
-        null, null, null, null, null, null, null, null, null
+        null, true, null, null, null, null, null, null, null
       ],
       date: {
         startDate: new Date(),

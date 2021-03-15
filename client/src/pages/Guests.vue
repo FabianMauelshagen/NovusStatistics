@@ -2,7 +2,7 @@
   <div>
     <Header header="Kunden Statistik" />
     <time-component v-on:date-changed="date = $event; refresh()"></time-component>
-    <Card :n=type.length chart-type="pie" :new-series="pieSeries" :new-labels="pieLabels" card-text="Systemdiagnose" :new-names="statsNames" :new-pie-size="450"/>
+    <Card :n=type.length chart-type="pie" :new-series="pieSeries" :new-labels="pieLabels" card-text="Systemdiagnose" :new-names="statsNames" :new-pie-size="420"/>
     <Card chart-type="line" :new-series="statsSeries" :new-labels="statsValues" card-text="Kundenaufkommen" :new-title="['Kunden Anzahl kumuliert', 'pro Tag']" />
     <Card :n=1 chart-type="pie" :new-series="[inviteSeries]" :new-labels="[inviteLabels]" card-text="Screen-Sharing Annahme" :new-names="['Screen-Sharing']" 
     :new-pie-size="550"/>
