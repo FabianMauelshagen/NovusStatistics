@@ -88,7 +88,7 @@ const time = require('../assets/time')
 import PieChart from '../components/PieChart'
 import Header from '../components/Header'
 
-
+// Funktion zum Ersetzen von String A durch String B
 String.prototype.allReplace = function (obj) {
     var retStr = this
     for (var x in obj) {
@@ -156,7 +156,7 @@ export default {
     },
     methods: {
 
-
+        
         getDurations() {
             axios.get(getDurationsURL, {
                 params: {

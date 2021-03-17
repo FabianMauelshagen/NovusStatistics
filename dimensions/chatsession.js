@@ -2,11 +2,12 @@ const express = require('express')
 const router = express.Router()
 const Model = require('../dimensions/models')
 
-// Erster Guest Joined und Letzter GuestLeft von allen Chat Sessions
+// Erster Guest Joined und Letzter GuestLeft von allen Chat Sessions, Genutzt für die Berechnung der Sitzungsdauer
 function chatSessionAggregate(startDate, endDate) {
   return new Promise(function (resolve, reject) {
     let array = []
     Model.chatevent_coll.aggregate([{
+      // Zeit Filter
       $match: {
         $and: [{
           createdAt: {
@@ -19,6 +20,7 @@ function chatSessionAggregate(startDate, endDate) {
         }]
       }
     }, {
+      // Filter für Zutritt und Austritt
       $match: {
         $or: [{
           type: 'guestJoined'
@@ -27,11 +29,13 @@ function chatSessionAggregate(startDate, endDate) {
         }]
       }
     }, {
+      // Festlegen der anzuzeigenden Felder
       $project: {
         user: 1,
         chatSession: 1,
         createdAt: 1,
         type: 1,
+        // Formatierung des Timestamps in Uhrzeit String
         datetime: {
           '$dateToString': {
             'format': '%H:%M:%S',
@@ -40,6 +44,7 @@ function chatSessionAggregate(startDate, endDate) {
         }
       }
     }, {
+      // Gruppieren nach Chat_id, Anzeige der frühesten (min) und spätesten (max) Werts
       $group: {
         _id: '$chatSession',
         max: {
@@ -53,10 +58,12 @@ function chatSessionAggregate(startDate, endDate) {
         }
       }
     }, {
+      //  Neues Feld  für nachträgliche Speicherung der berechneten Dauer
       $addFields: {
         duration: new Date('')
       }
     }, {
+      // Sortieren nach ID
       $sort: {
         createdAt: 1
       }
@@ -75,23 +82,27 @@ function chatSessionAggregate(startDate, endDate) {
 function getDurations(startDate, endDate) {
   return new Promise(function (resolve, reject) {
     chatSessionAggregate(startDate, endDate).then(function (array) {
-      let first = ''
-      let last = ''
-      let long = 0
-      let short = 0
-      let i = 0
-      let totalDur = 0
-      let avgDur = 0
-      let durations = []
-      let stats = []
+      let first = '' // Erster Beitritt
+      let last = '' // Letzter Austritt
+      let long = 0  // längste Zeit
+      let short = 0 // Kürzeste Zeit
+      let i = 0 // Counter
+      let totalDur = 0 // Gesamte Duaer
+      let avgDur = 0 // Durchschnittliche Duaer
+      let durations = [] // Array mit den berechneten Zeitwerten
+      let stats = [] // Array für die fertigen Zeit Statistiken (Min, Max, Avg)
       for (elem of array) {
+        // Ausschluss von Fehlerhaften und 0 Werten
         if (!(elem.min == elem.max)) {
           first = calcTime(elem.min)
           last = calcTime(elem.max)
+          // Berechnet die Zeit in Millisekunden die zwischen den zwei Daten first und last vergangen ist
           let diff = last.getTime() - first.getTime()
+          // true wenn short noch nicht belegt wurde oder der neue Wert kleiner als der bereits gespeicherte Wert ist.
           if (short == 0 || diff < short) {
             short = diff;
           }
+          // true wenn long noch nicht belegt wurde oder der neue Wert kleiner als der bereits gespeicherte Wert ist.
           if (long == 0 || diff > long) {
             long = diff;
           }
@@ -105,7 +116,9 @@ function getDurations(startDate, endDate) {
       avgDur = new Date((totalDur / i))
       let longestDuration = new Date(long)
       let shortestDuration = new Date(short)
+      // Belegen des Statistik Arrays mit den fertigen Werten
       stats[0] = i
+      //  Math.ceil zum aufrunden, da in den Diagrammen nur volle Minuten angezeigt werden und somit auch Werte < 60 Sekunden angezeigt werden
       stats[2] = Math.ceil(shortestDuration.getTime() / 60000)
       stats[3] = Math.ceil(longestDuration.getTime() / 60000)
       stats[1] = Math.ceil(avgDur.getTime() / 60000)
@@ -125,15 +138,18 @@ function agentSettingsAggregate() {
   return new Promise(function (resolve, reject) {
     let array = []
     Model.agentSettings_coll.aggregate([{
+      // Auswahl der Felder
       $project: {
         _id: 1,
         title: 1
       }
     }, {
+      // Counter Variable zum späteren berechnen der Gesamtanzahl
       $addFields: {
         count: 0
       }
     }, {
+      // Begrenzung des Ausgabe Strings auf 30 Zeichen zum Ausschluss von Fehlerhaften Daten
       '$redact': {
         '$cond': [
           {
@@ -161,6 +177,7 @@ function ratingsAggregate(startDate, endDate) {
   return new Promise(function (resolve, reject) {
     agentSettingsAggregate().then(function (array) {
       Model.agentRatings_coll.aggregate([{
+        // Zeitfilter
         $match: {
           $and: [{
             createdAt: {
@@ -173,19 +190,28 @@ function ratingsAggregate(startDate, endDate) {
           }]
         }
       }, {
+        // Auswahl Felder
         $project: {
           chatSession: 1,
           agentRatingSettings: 1,
           createdAt: 1
         }
       }], function (err, result) {
+        // Anzahl des Wertes der am meisten vorkam
         let maxWert = 0
+        // Anzahl des Wertes der am wenigsten vorkam
         let minWert = 0
+        // Falls mehrere Themen am meisten vorkamen
         let maxThema = []
+        // Falls mehrere Themen am wenigsten vorkamen (Häufig)
         let minThema = []
+        // Speichern der minWerte und minThemen
         let minStats = []
+        // Speichern der maxWerte und maxThemen
         let maxStats = []
+        // Speichern der Themen mit Nutzung > 0
         let used = []
+        // Speichern der Themen mit Nutzung = 0
         let notUsed = []
         //Alle Dokumente aus der agentRatings Collection
         for (rt of result) {
@@ -207,9 +233,11 @@ function ratingsAggregate(startDate, endDate) {
           } else {
             used[used.length] = elem
           }
+          // true wenn maxWert noch nicht belegt oder neuer Wert größer wie aktuell gespeichert
           if (maxWert == 0 || maxWert < elem.count) {
             maxWert = elem.count
           }
+          // selbe wie maxWert nur 0 Werte werden ignoriert
           if (minWert == 0 || (minWert > elem.count && elem.count != 0)) {
             minWert = elem.count
           }
@@ -244,6 +272,7 @@ function getUsedFunctionsInOrder(startDate, endDate) {
   return new Promise(function (resolve, reject) {
     Model.chatevent_coll.aggregate([
       {
+        // Zeitfilter
         '$match': {
           '$and': [
             {
@@ -258,14 +287,17 @@ function getUsedFunctionsInOrder(startDate, endDate) {
           ]
         }
       }, {
+        // Filter nach Funktionen
         '$match': {
           '$and': [
             {
               'type': {
+                // Mit allen Werte die "Changed" beinhalten
                 '$regex': new RegExp('Changed')
               }
             }, {
               'type': {
+                // Ohne alle Werte die "recordingChanged" beinhalten
                 '$not': new RegExp('recordingChanged')
               }
             }, {
@@ -280,19 +312,23 @@ function getUsedFunctionsInOrder(startDate, endDate) {
           ]
         }
       }, {
+        // Grupieren nach ChatSession und innerhalb dieser nach Funktionsytyp
         '$group': {
           '_id': {
             '_id': '$chatSession', 
             'type': '$type'
           }, 
+          // Zählen der Funktionsnutungen
           'count': {
             '$sum': 1
           }, 
+          // Anhängen des Timestamps zur Funktionsnutzung
           'createdAt': {
             '$first': '$createdAt'
           }
         }
       }, {
+        // Auswahl der Felder
         '$project': {
           '_id': '$_id._id', 
           'type': '$_id.type', 
@@ -304,6 +340,7 @@ function getUsedFunctionsInOrder(startDate, endDate) {
           'createdAt': 1
         }
       }, {
+        // Neues Gruppieren und Ablegen der Funktionen in functions Array (Ausschluss von doppelten Dokumenten)
         '$group': {
           '_id': '$_id', 
           'createdAt': {
@@ -317,15 +354,18 @@ function getUsedFunctionsInOrder(startDate, endDate) {
           }
         }
       }, {
+        // Aufteilen des Dokuments in eigene Dokumente nach den Werten des functions Arrays
         '$unwind': {
           'path': '$functions'
         }
       },  {
+        // Sortieren zuerst nach Zeit dann nach ID
         '$sort': {
           'createdAt': 1, 
           '_id': 1
         }
       },{
+        // Formatieren der Ausgabe Dokumente
         '$project': {
           '_id': 1, 
           'createdAt': {
@@ -354,6 +394,7 @@ function getTotalByDate(startDate, endDate) {
   return new Promise(function (resolve, reject) {
     let total = 0
     Model.chatsessions_coll.aggregate([{
+      //  Zeitfilter
       $match: {
         $and: [{
           createdAt: {
@@ -366,6 +407,7 @@ function getTotalByDate(startDate, endDate) {
         }]
       }
     }, {
+      // Gruppieren nach der Count Variablen
       $group: {
         _id: null,
         count: {
@@ -386,6 +428,7 @@ function getTotalGAByDate(startDate, endDate) {
   return new Promise(function (resolve, reject) {
     let totals = [0, 0]
     Model.chatsessions_coll.aggregate([{
+      // Zeitfilter
       $match: {
         $and: [{
           createdAt: {
@@ -398,19 +441,24 @@ function getTotalGAByDate(startDate, endDate) {
         }]
       }
     }, {
+      //Auswahl Felder -> Anzahl Gäste / Berater pro Dokument
       $project: {
         _id: 1,
         activeGuests: {
           $cond: {
+            // true wenn das array "guests" existiert
             if: {
               $isArray: '$guests'
             },
+            // Wenn true: Größe des "guests" arrays (also Anzahl Gäste)
             then: {
               $size: '$guests'
             },
+            // false: 0 (Keine Gäste)
             else: 0
           }
         },
+        // Selbes Vorgehen wie bei Gästen
         activeAgents: {
           $cond: {
             if: {
@@ -424,6 +472,7 @@ function getTotalGAByDate(startDate, endDate) {
         }
       }
     }, {
+      // Zusammenzählen der Gäste und Agents für alle Dokumente
       $group: {
         _id: null,
         activeGuests: {
@@ -471,6 +520,7 @@ function getAvgStats(startDate, endDate) {
   })
 }
 
+// Get Funktion für den Aufruf im Frontend über den '/xx' Pfad
 router.get('/getDurations', async (req, res) => {
   try {
     let startDate = req.query.start

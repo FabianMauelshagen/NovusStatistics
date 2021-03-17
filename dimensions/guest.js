@@ -8,6 +8,7 @@ function getUseCounts(startDate, endDate, i) {
   return new Promise(function (resolve, reject) {
     let fields = ['$browserName', '$osName', '$hasCamera', '$hasMicrophone', '$hasSpeakers']
     Model.sysdiagnostics_coll.aggregate([{
+        // Zeitfilter
         $match: {
           $and: [{
             createdAt: {
@@ -20,6 +21,7 @@ function getUseCounts(startDate, endDate, i) {
           }]
         }
       }, {
+        // Gruppieren nach dem jeweiligen Feld Inhalt und Zählen der Anzahl
         $group: {
           _id: fields[i],
           count: {
@@ -27,6 +29,7 @@ function getUseCounts(startDate, endDate, i) {
           }
         }
       }, {
+        // Absteigend sortieren
         $sort: {
           count: 1
         }
@@ -44,6 +47,7 @@ function getTotal(startDate, endDate) {
 
   return new Promise(function (resolve, reject) {
     Model.guests_coll.aggregate([{
+        // Zeitfilter
         $match: {
           $and: [{
             createdAt: {
@@ -56,6 +60,7 @@ function getTotal(startDate, endDate) {
           }]
         }
       }, {
+        // Zusammenzählen aller Dokumente + Zeitstempel 
         $group: {
           _id: null,
           count: {
@@ -66,6 +71,7 @@ function getTotal(startDate, endDate) {
           }
         }
       }, {
+        // Definieren der anzuzeigenden Felder (Zeitstempel wichtig für Anzeige in Diagramm)
         $project: {
           date: 1,
           count: 1,
@@ -76,13 +82,14 @@ function getTotal(startDate, endDate) {
       let c = null
       let d = 0
       for (elem of result) {
+        // Auslesen der Zählvariablen
         c = elem.count
+        // Umwandeln des Zeitstempels in Millisekunden
         var dateVar = new Date(elem.date)
         d = dateVar.getTime()
       }
+      // Abspeichern des Rückgabewerts (Format: [Date in Millisekunden, Zähler als Integer])
       resolve([d, c])
-
-
     })
   })
 }
@@ -97,21 +104,27 @@ function getTotal(startDate, endDate) {
 //                          result[1][3] = (number) max         -> Größte Anzahl Guests Gesamt
 function getStats(startDate, endDate) {
   return new Promise(async function (resolve, reject) {
+     // Initialisieren der Rückgabe Arrays
     let totals = []
     let stats = []
+    // Initialiseren der Statistik Variablen
     let total = 0
     let avg = 0
     let min = 0
     let max = 0
     let i = 0
+    // Initialisieren der Datums Werte zum Iterieren über die einzelnen Tage der übergebenen Zeitspanne
     let newStartDate = new Date(startDate)
     let currentDate = new Date(endDate)
     let currentStartDate = new Date(endDate)
+    // Iterieren über die übergebene Zeitspanne
     while (currentStartDate >= newStartDate) {
       await getTotal(currentStartDate, currentDate).then(function (res) {
+        // Wenn es an dem aktuellen Datum einen Wert gibt wird dieser in totals an der Indexstelle i gespeichert
         if (res[0] != 0) {
           totals[i] = res
         } else {
+          // Wenn nicht wird dafür eine 0 eingetragen, damit die spätere Zeitlinie im Diagramm alle Werte anzeigt
           totals[i] = [currentStartDate.getTime(), 0]
         }
       })
@@ -120,6 +133,7 @@ function getStats(startDate, endDate) {
       currentStartDate.setHours(0, 0, 0, 0)
       i++
     }
+    // Herauslesen des größten und kleinsten Werts
     for (elem of totals) {
       if (min == 0 || (min > elem[1] && elem[1] != 0)) {
         min = elem[1]
@@ -129,7 +143,9 @@ function getStats(startDate, endDate) {
       }
       total += elem[1]
     }
+    // Durchschnitt berechnen
     avg = Math.round(((total / totals.length) + Number.EPSILON) * 100) / 100
+    // Abspeichern der Werte
     stats[0] = total
     stats[1] = avg
     stats[2] = min
@@ -141,6 +157,7 @@ function getStats(startDate, endDate) {
 // Annahme / Ablehnung der Screensharing Einladung
 function getInviteStats(startDate, endDate) {
     return Model.chatevent_coll.aggregate([{
+      // Zeitfilter
       $match: {
         $and: [{
           createdAt: {
@@ -153,10 +170,12 @@ function getInviteStats(startDate, endDate) {
         }]
       }
     }, {
+      // Filter nach Typ
       $match: {
         type: 'screenSharingInviteResponse'
       }
     }, {
+      // Gruppieren nach Wert in data.action + Summieren dieses Werts
       $group: {
         _id: '$data.action',
         count: {
@@ -176,6 +195,7 @@ function getInviteStats(startDate, endDate) {
 let endDate = time.getSpecificDate('2020-10-10')[1] */
 
 // User System Statistik (Anzahl Browser Nutzung etc.)
+// Get Funktion für Aufruf im Frontend
 router.get('/getUseCounts', async (req, res) => {
   try {
     let startDate = req.query.start

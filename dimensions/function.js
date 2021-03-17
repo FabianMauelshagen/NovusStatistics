@@ -45,6 +45,7 @@ function getBusyTimesForEach(startDate, endDate, from, to, action, type) {
         }
       }
     }, {
+      // Filtern nach Stunden
       '$match': {
         '$and': [{
           'hours': {
@@ -129,9 +130,10 @@ async function getBusyTimesLoop(startDate, endDate) {
   return types
 }
 
-
+// Kumulierte Funktionsnutzungen pro Stunde für alle  Funktionen
 function getBusyTimes(startDate, endDate, from, to) {
   const res = Model.chatevent_coll.aggregate([{
+    //Zeitfilter
     $match: {
       $and: [{
         createdAt: {
@@ -144,6 +146,7 @@ function getBusyTimes(startDate, endDate, from, to) {
       }]
     }
   }, {
+    // Filtern nach Funktionen
     '$match': {
       '$or': [{
         '$and': [{
@@ -172,13 +175,16 @@ function getBusyTimes(startDate, endDate, from, to) {
       }]
     }
   }, {
+    // Auswahl der Felder
     '$project': {
       '_id': 0,
       'type': 1,
       'hours': {
+        // Ausgabe der vollen Stunde des Timestamps
         '$hour': '$createdAt'
       },
       'datetime': {
+        //Formatierung des timestamp in einen Uhrzeit String
         '$dateToString': {
           'format': '%H:%M:%S',
           'date': '$createdAt'
@@ -186,6 +192,7 @@ function getBusyTimes(startDate, endDate, from, to) {
       }
     }
   }, {
+    // Filtern nach Stunden 
     '$match': {
       '$and': [{
         'hours': {
@@ -198,6 +205,7 @@ function getBusyTimes(startDate, endDate, from, to) {
       }]
     }
   }, {
+    // Gruppieren und summieren der Stunden
     '$group': {
       '_id': '$hours',
       'count': {
@@ -205,6 +213,7 @@ function getBusyTimes(startDate, endDate, from, to) {
       }
     }
   }, {
+    // Sortieren der Stunden 
     '$sort': {
       '_id': 1
     }
@@ -212,6 +221,7 @@ function getBusyTimes(startDate, endDate, from, to) {
   return res
 }
 
+// Veraltet
 function getAllDurations(startDate, endDate) {
   const res = Model.chatevent_coll.aggregate([{
     $match: {
@@ -298,6 +308,7 @@ function getAllDurations(startDate, endDate) {
 function getDurations(startDate, endDate, i) {
   let types = ['coBrowsingChanged', 'videoChanged', 'screenSharingChanged', 'whiteboardChanged']
   const res = Model.chatevent_coll.aggregate([{
+    // Zeitfilter
     $match: {
       $and: [{
         createdAt: {
@@ -310,6 +321,7 @@ function getDurations(startDate, endDate, i) {
       }]
     }
   }, {
+    // Filtern nach Funktionen
     '$match': {
       '$and': [{
         'type': types[i]
@@ -326,6 +338,7 @@ function getDurations(startDate, endDate, i) {
       }]
     }
   }, {
+    //Gruppieren nach Chatsitzung, dann nach Gast, dann nach Funktionstyp
     '$group': {
       '_id': {
         'chatSession': '$chatSession',
@@ -340,6 +353,7 @@ function getDurations(startDate, endDate, i) {
       }
     }
   }, {
+    // Vorbereiten der neuen Dokument Struktur
     '$project': {
       '_id': 0,
       '_chatSession': '$_id.chatSession',
@@ -361,6 +375,7 @@ function getDurations(startDate, endDate, i) {
       }
     }
   }, {
+    // Ausschluss der Dokumente mit gleicher Start und Stop Zeit
     '$match': {
       '$expr': {
         '$ne': [

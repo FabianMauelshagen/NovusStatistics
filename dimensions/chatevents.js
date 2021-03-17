@@ -5,9 +5,13 @@ const mongoose = require('mongoose')
 const chatEventsSchema = new mongoose.Schema()
 const ChatEvent = mongoose.model('chatevent', chatEventsSchema)
 
-let startDate = '1991-08-06'
-let endDate = new Date()
-//as
+// 
+
+// Diese Datei ist veraltet und wird nicht weiter genutzt
+
+//
+
+
 // Get all session interrupts
 function getSessionInterrupts(startDate, endDate) {
   return ChatEvent.aggregate([{
@@ -23,10 +27,12 @@ function getSessionInterrupts(startDate, endDate) {
         }]
       }
     }, {
+      // Filtern nach chatEvent Typ
       '$match': {
         'type': 'agentInterrupted'
       }
     }, {
+      // Gruppieren nach Nutzer und Typ + Zählen des Vorkommens
       '$group': {
         '_id': {
           'user': '$user',
@@ -41,6 +47,7 @@ function getSessionInterrupts(startDate, endDate) {
         'path': '$_id'
       }
     }, {
+      // Gruppieren nach Nutzer sowie den ersten vorhanden Werten
       '$group': {
         '_id': '$_id.user',
         'type': {
@@ -51,6 +58,7 @@ function getSessionInterrupts(startDate, endDate) {
         }
       }
     }, {
+      // Join mit den User Dokumenten (Herausholen des zur ID zugehörigen Users)
       '$lookup': {
         'from': 'users',
         'localField': '_id',
@@ -62,6 +70,7 @@ function getSessionInterrupts(startDate, endDate) {
         'path': '$user'
       }
     }, {
+      // Gruppieren und hinzufügen des Usernamens
       '$group': {
         '_id': '$_id',
         'type': {
@@ -85,11 +94,6 @@ function getSessionInterrupts(startDate, endDate) {
     }
 
   ])
-}
-
-// Get all problem solving frequencies
-function getProblemSolvingFrequency() {
-
 }
 
 // Get used functions by a user
