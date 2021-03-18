@@ -1,3 +1,5 @@
+<!-- Konfigurationsdatei für alle Torten Diagramme -->
+
 <template>
     <div class="chart" id="chart" align="center">
         <apexchart type="pie" :width="pieSize" :options="chartOptions" :series="dataSeries">

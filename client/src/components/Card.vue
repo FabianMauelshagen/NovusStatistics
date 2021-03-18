@@ -1,3 +1,5 @@
+<!-- Konfigurations File für den Bereich der die Reiter enthält-->
+
 <template>
     <div>
         <b-card no-body class="mb-1">

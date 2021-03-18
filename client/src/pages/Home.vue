@@ -1,3 +1,5 @@
+<!-- Vue File für die Einstiegsmaske -->
+
 <template>
     <div>
         <b-container class="homeCont">

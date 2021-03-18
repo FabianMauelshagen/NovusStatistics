@@ -1,3 +1,5 @@
+<!-- Konfigurations File für die Zeitleiste -->
+
 <template>
   <div>
     <b-container>

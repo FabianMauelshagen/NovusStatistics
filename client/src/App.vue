@@ -1,3 +1,5 @@
+<!-- Haupt Konfigurations File der Anwendung, hier werden hauptsächlich die globalen css Einstellungen gespeichert  -->
+
 <template>
   <div class="bg">
     <div id="app">

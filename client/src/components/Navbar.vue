@@ -1,3 +1,5 @@
+<!-- Konfigurationsdatei für das Navigationsmenü -->
+
 <template>
     
     <div>  

@@ -1,3 +1,5 @@
+<!--       Konfigurations File für die Linien Diagramme           -->
+
 <template>
     <div id="chart">
             <apexchart ref="statChart" :height="500" :options="chartOptions" :series="dataSeries">

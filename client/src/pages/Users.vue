@@ -39,6 +39,7 @@ export default {
     }
   },
   methods: {
+    // Anzahl der Sitzungsunterbrechungen
     getSessionInterrupts() {
         
       axios.get(sessionInterruptsURL, {
@@ -50,6 +51,7 @@ export default {
         let countArr = []
         for(var element of res.data){
           countArr.push(element.count)
+          // Anonymisierung des Beraters
           this.sessionInterruptsLabels.push(this.replace(element.username))
         }
         this.sessionInterruptsSeries.push({
@@ -60,6 +62,7 @@ export default {
         this.error.push(e)
       })
     },
+    // Anzhal der vom Berater akzeptierten Sitzungen
     getFrequencyOfAcceptance() {
       axios.get(frequencyOfAcceptanceURL, {
         params: {
@@ -70,6 +73,7 @@ export default {
         let countArr = []
         for(var element of res.data){
           countArr.push(element.count)
+          // Anonymisierung des Beraters
           this.frequencyOfAcceptanceLabels.push(this.replace(element.username))
         }
         this.frequencyOfAcceptanceSeries.push({
@@ -80,6 +84,7 @@ export default {
         this.error.push(e)
       })
     },
+    // Anzeige der vom Berater benutzten Funktionen
     getUsedFunctions() {
       axios.get(usedFunctionsURL, {
         params: {
@@ -88,11 +93,13 @@ export default {
         }
       }).then(res => {
         for(var element of res.data[0]){
+        // Daten Array füllen
           this.usedFunctionsSeries.push({
             name: element.name,
             data: element.values
           })
         }
+        // Label Array füllen
         for(var name of res.data[1]){
             this.usedFunctionsLabels.push(name)
         }
@@ -100,6 +107,7 @@ export default {
         this.error.push(e)
       })
     },
+    // leeren alle Arrays
     clearArrays(){
         this.usedFunctionsSeries.length = 0,
         this.sessionInterruptsSeries.length = 0
@@ -114,10 +122,15 @@ export default {
       this.getFrequencyOfAcceptance()
       this.getUsedFunctions()
     },
+    // Anonymisierung der Berater
+    // Hinweis: Funktion funktioniert nicht sobald str.length > 16 -> Evtl Abfrage einbauen sofern Username größer als 8 Zeichen sein darf
     replace(str) {
+    let stringMaxLength = 8 // Maximal Länge des gespeicherten Usernames 
+    // Erste Hälfte des Strings extrahieren
     str = str.substr(0, (str.length/2))
     let i = str.length
-    for(i; i < 8; i++){
+    // String bis zum 8. Zeichen mit * auffüllen
+    for(i; i < stringMaxLength; i++){
       str = str + '*'
     }
     return str

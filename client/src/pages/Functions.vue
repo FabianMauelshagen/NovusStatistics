@@ -1,3 +1,5 @@
+<!-- Vue File für die Funktions Dimension -->
+
 <template>
     <div>
         <Header header="Funktions Statistik" />
@@ -47,11 +49,17 @@ const getBusyTimesURL = 'http://localhost:3000/functions/getBusyTimes'
 const getBusyTimesLoopURL = 'http://localhost:3000/functions/getBusyTimesLoop'
 const calcEachDayURL = 'http://localhost:3000/functions/calcEachDay'
 const calcTotalURL = 'http://localhost:3000/functions/calcTotal'
+
+// Import des Deutschen Sprachpakets für die ApexCharts
 import de from "apexcharts/dist/locales/de.json"
+
 import Card from '../components/Card'
 import Header from '../components/Header'
 
+// Import der Zeit Funktionen
 const time = require('../assets/time')
+
+// Initialisieren des Stunden Arrays
 var labArr = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
 export default {
@@ -61,6 +69,7 @@ export default {
         Header
     },
     data() {
+        // Definieren der lokal genutzten Variablen und Arrays
         return {
             labArr: labArr,
             collapse2: {
@@ -74,6 +83,7 @@ export default {
                 startDate: time.getSpecificDate('2020-11-01')[0],
                 endDate: time.getSpecificDate('2020-11-07')[1]
             },
+            // Konfigurationseinstellung des Diagramms
             functionLineOptions: {
                 chart: {
                     locales: [de],
@@ -127,9 +137,8 @@ export default {
         }
     },
     methods: {
-
+        // Anzeige der Zeitenspanne, in der die Funktionen verwendet worden sind (bzw. wie lange bestimmte Funktionen benutzt worden sind)
         getBusyTimes() {
-
             axios.get(getBusyTimesURL, {
                 params: {
                     start: this.date.startDate,
@@ -138,7 +147,10 @@ export default {
             }).then(res => {
                 let valArr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 let i = 0
+                // Boolean zum test, ob valArr ein reines 0 Array ist
                 let zero = true
+                // Wenn das Element aus dem Stunden Array labArr mit einem Element aus res.data übereinstimmt wird der Wert in das Werte Array geschrieben
+                // Außerdem wird die zero Variable auf false gesetzt, da es dann kein reines 0 Array mehr ist
                 for (var elem of labArr) {
                     for (var el of res.data) {
                         if (elem == el._id) {
@@ -148,6 +160,7 @@ export default {
                     }
                     i++
                 }
+                // Löschen des Arrays, damit im Diagramm "Keine Daten" angezeigt wird
                 if(zero) valArr.length = 0
                 this.series = [{
                     name: 'Nutzungen',
@@ -157,6 +170,8 @@ export default {
                 this.error.push(e)
             })
         },
+
+        // Füllen des Stacked Bar Charts, Loop der getBusyTimes Funktion für alle Funktionen
         getBusyTimesLoop() {
             axios.get(getBusyTimesLoopURL, {
                 params: {
@@ -174,7 +189,7 @@ export default {
                 this.error.push(e)
             })
         },
-
+        // Berechnung der Dauer der Funktionen für einzelne Tage über eine Zeitspanne
         calcEachDay(array, funcIndex) {
             axios.get(calcEachDayURL, {
                 params: {
@@ -184,10 +199,12 @@ export default {
                 }
             }).then(val => {
                 for (var elem of val.data) {
+                    // Boolean für noData
                     let zero = true
                     for(var data of elem.data){
                         if(data[1] != 0) zero = false
                     }
+                    // Leeren des Arrays falls es keine Daten enthält (Zur Anzeige von "Keine Daten" im Diagramm)
                     if(!zero){
                         array.push({
                             name: elem.name,
@@ -201,11 +218,12 @@ export default {
                     }
                     
                 }
+
             }).catch(e => {
                 this.error.push(e)
             })
         },
-
+        //
         calcTotalDurations(array, funcIndex) {
             axios.get(calcTotalURL, {
                 params: {
@@ -221,20 +239,20 @@ export default {
                 this.error.push(e)
             })
         },
-
+        // Ausfüllen der Series des Diagramms
         populateFunctionSeries() {
             this.clearFunctionArrays()
             for (var i = 0; i < 4; i++) {
                 this.calcEachDay(this.functionSeries[i], i)
             }
         },
-
+        // Ausfüllen der Labels des Diagramms
         populateFunctionStats() {
             for (var i = 0; i < 4; i++) {
                 this.calcTotalDurations(this.functionStats[i], i)
             }
         },
-
+        // Leeren alle Arrays
         clearFunctionArrays() {
             for (var elem of this.functionSeries) {
                 elem.length = 0

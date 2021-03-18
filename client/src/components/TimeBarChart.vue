@@ -1,3 +1,5 @@
+<!--     Konfigurations File für die Balken Diagramme mit ganzen Stunden Werten     -->
+
 <template>
     <div id="chart">
         <apexchart type="bar" :height="350" :options="chartOptions" :series="dataSeries">

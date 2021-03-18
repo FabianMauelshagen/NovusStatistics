@@ -1,3 +1,5 @@
+<!-- Vue File für die Chat Sitzungs Dimension -->
+
 <template>
     <div>
         <Header header="Sitzungs Statistik" />
@@ -78,11 +80,18 @@
 </template>
 
 <script>
+// Folgende Kommentierung bezieht sich auch auf die restlichen Pages
+
+// Middleware
 const axios = require('axios')
+
+// Pfad zum Backend File
 const getDurationsURL = 'http://localhost:3000/chatsessions/getDurations'
 const getAvgStatsURL = 'http://localhost:3000/chatsessions/getAvgStats'
 const getUsedFunctionsURL = 'http://localhost:3000/chatsessions/getUsedFunctions'
 const ratingsAggregateURL = 'http://localhost:3000/chatsessions/ratingsAggregate'
+
+// Import der Komponenten
 import Card from '../components/Card'
 const time = require('../assets/time')
 import PieChart from '../components/PieChart'
@@ -105,6 +114,7 @@ export default {
     Header
     },
     data() {
+        // Definieren aller Lokal genutzten Variablen und Arrays
         return {
             collapse1: {
                 show: false
@@ -155,8 +165,7 @@ export default {
         }
     },
     methods: {
-
-        
+        // Berechnung der Sitzungsdauer
         getDurations() {
             axios.get(getDurationsURL, {
                 params: {
@@ -166,15 +175,17 @@ export default {
             }).then(res => {
                 let arr = []
                 this.durationStats = res.data[1]
+                // Iterieren über das Ergebnis Array
                 for (var elem of res.data[0]) {
                     let time = new Date(elem.createdAt)
                     let dur = new Date(elem.duration)
-                    arr.push([time.getTime(), Math.ceil(dur / 60000)])
+                    arr.push([time.getTime(), Math.ceil(dur / 60000)]) //arr[0] timestamps in Milliseckunden
+                    //Math.ceil für die Aufrundung
                 }
                 this.series = [{
                     name: "Minuten",
                     data: arr
-                }]
+                }] 
                 this.durationSeries = [{
                     name: "ChatSessions",
                     data: this.series
@@ -185,6 +196,7 @@ export default {
             })
         },
 
+        // Berechnung der Durchschnittsstatistik
         getAvgStats() {
             axios.get(getAvgStatsURL, {
                 params: {
@@ -193,6 +205,7 @@ export default {
                 }
             }).then(res => {
                 this.avgStats = res.data
+                // true wenn es keine Guests und keine Agents gibt, dann wird leeres Array übergeben (Im Diagramm wird dann "Keine Daten" statt einer 0 angezeigt)
                 if(res.data[1] !== 0 && res.data[3] !== 0){
                     this.gaSeries = [res.data[1], res.data[3]]
                 } else {
@@ -203,6 +216,7 @@ export default {
             })
         },
 
+        // Zeige alle Chatsessions mit allen in der Chatsession benutzten Funktionen in chronologischer Nutzungsreihenfolge
         getUsedFunctions() {
             axios.get(getUsedFunctionsURL, {
                 params: {
@@ -226,6 +240,7 @@ export default {
             })
         },
 
+        // Anzeige der Häufigkeit einzelner ChatSession Themen
         ratingsAggregate() {
             axios.get(ratingsAggregateURL, {
                 params: {
@@ -237,6 +252,7 @@ export default {
                 this.minStats = this.ratingStats[0]
                 this.maxStats = this.ratingStats[1]
                 let arr = []
+                // Iterieren über Ergebnis
                 for (var elem of res.data[0]) {
                     arr.push(elem.count)
                     if (elem) {
@@ -249,6 +265,7 @@ export default {
             })
         },
 
+        // Datei in CSV Format exportieren
         csvExport(arrData) {
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += [
@@ -265,6 +282,7 @@ export default {
             link.click();
         },
 
+        // Funktion zum aktualisieren des Contents
         async refresh() {
             this.ratingLabels.length = 0
             this.getDurations()
@@ -283,6 +301,7 @@ export default {
         this.resize()
     },
     computed: {
+        //Berechnung Anzahl der Zeilen in der Tabelle
         rows() {
             return this.usedFunctions.length
         }
@@ -292,11 +311,6 @@ export default {
 </script>
 
 <style scoped>
-
-    #functionTable{
-        
-    }
-
     .tbtn {
         position: absolute;
         right: 0px;
