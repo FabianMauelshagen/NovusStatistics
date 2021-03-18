@@ -28,3 +28,6 @@ npm run serve
 Anschließend im Browser den folgenden Link öffnen:
 
 http://localhost:8080/
+
+
+Hinweis: Die Anwendung funktioniert nur mit einer laufenden MongoDB Instanz. Dazu muss eine Verbindung zur Novus Datenbank auf 127.0.0.1:27017 bestehen.
